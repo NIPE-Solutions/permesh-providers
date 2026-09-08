@@ -32,7 +32,7 @@ jobs:
       - name: Exercise offline native description
         shell: bash
         run: |
-          for provider in github google cloudflare; do
+          for provider in github google cloudflare aws; do
             binary="target/debug/permesh-provider-$provider"
             if [ "$RUNNER_OS" = Windows ]; then binary="$binary.exe"; fi
             python scripts/smoke_provider.py --provider "$provider" "$binary"
@@ -44,5 +44,5 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - run: rustup toolchain install 1.91.0 --profile minimal
-      - run: cargo +1.91.0 check --workspace --all-targets --locked
+      - run: rustup toolchain install 1.94.1 --profile minimal
+      - run: cargo +1.94.1 check --workspace --all-targets --locked

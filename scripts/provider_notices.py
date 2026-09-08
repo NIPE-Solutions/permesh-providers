@@ -1,5 +1,6 @@
 """Collect source-supplied license and notice texts from a locked Cargo graph."""
 import hashlib
+import json
 import os
 from pathlib import Path
 import re
@@ -43,6 +44,45 @@ def workspace_license_root(package, directory, root):
     raise ValueError('pinned SDK workspace license root is missing')
 
 
+def supplemental_notice(package, root):
+    """Use only checked-in notices bound to the exact reviewed registry package."""
+    root = Path(root)
+    manifest = root / 'third-party' / 'notice-supplements.json'
+    if not manifest.exists():
+        return None
+    entries = json.loads(regular_bytes(manifest, MAX_NOTICE_BYTES))
+    if not isinstance(entries, list) or len(entries) > 32:
+        raise ValueError('notice supplement mapping is invalid')
+    matches = [entry for entry in entries if entry.get('name') == package['name']
+               and entry.get('version') == package['version']]
+    if not matches:
+        return None
+    if len(matches) != 1:
+        raise ValueError('notice supplement identity is ambiguous')
+    entry = matches[0]
+    if any(package.get(key) != entry.get(key) for key in ('source', 'license', 'repository')):
+        raise ValueError('notice supplement source or license does not match')
+    if entry['source'] != 'registry+https://github.com/rust-lang/crates.io-index':
+        raise ValueError('notice supplements require the reviewed crates.io source')
+    locked = tomllib.loads(regular_bytes(root / 'Cargo.lock', 4 * MAX_NOTICE_BYTES).decode('utf-8'))
+    records = [record for record in locked.get('package', [])
+               if all(record.get(key) == entry[key] for key in ('name', 'version', 'source'))]
+    if len(records) != 1 or records[0].get('checksum') != entry['checksum']:
+        raise ValueError('notice supplement crate checksum does not match the lock')
+    directory = Path(package['manifest_path']).absolute().parent
+    vcs = json.loads(regular_bytes(directory / '.cargo_vcs_info.json', 16384))
+    if vcs.get('git', {}).get('sha1') != entry['upstream_revision'] or vcs.get('path_in_vcs') != entry['upstream_path']:
+        raise ValueError('notice supplement upstream revision does not match')
+    relative = Path(entry['notice_file'])
+    if relative.is_absolute() or '..' in relative.parts or relative.parts[:2] != ('third-party', 'licenses'):
+        raise ValueError('notice supplement path is outside reviewed licenses')
+    path = root / relative
+    content = regular_bytes(path, MAX_NOTICE_BYTES)
+    if hashlib.sha256(content).hexdigest() != entry['notice_sha256']:
+        raise ValueError('notice supplement digest does not match')
+    return path
+
+
 def notice_files(package, root):
     directory = Path(package['manifest_path']).absolute().parent
     regular_bytes(directory / 'Cargo.toml', MAX_NOTICE_BYTES)
@@ -76,7 +116,11 @@ def notice_files(package, root):
     if workspace is not None:
         found.update(path for path in workspace.iterdir() if path.is_file() and NOTICE_NAME.search(path.name))
     if not found:
-        raise ValueError(f"missing source license/notice files: {package['name']} {package['version']}")
+        supplement = supplemental_notice(package, root)
+        if supplement is None:
+            raise ValueError(f"missing source license/notice files: {package['name']} {package['version']}")
+        found.add(supplement)
+        workspace = root
     return sorted(found), directory, workspace
 
 

@@ -102,6 +102,17 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(len(list(one.parent.iterdir())), 3)
                 self.assertEqual(verify_package.verify(one, one.parent / 'catalog-entry.json'), metadata)
 
+    def test_aws_package_has_attachment_capabilities_without_identity_authority(self):
+        target = package.TARGETS[0]
+        source = self.binary(target)
+        source.with_name('permesh-provider-aws').write_bytes(source.read_bytes())
+        self.metadata['packages'][0]['name'] = 'permesh-provider-aws'
+        archive = package.package(self.root, target, self.root / 'aws', 'aws')
+        metadata = verify_package.verify(archive, archive.parent / 'catalog-entry.json')
+        self.assertEqual(metadata['provider'], 'aws')
+        self.assertEqual(metadata['capabilities'], package.CAPABILITIES)
+        self.assertNotIn('identities', metadata['capabilities'])
+
     def test_google_package_has_its_identity_capabilities_and_mit_notice(self):
         target = package.TARGETS[0]
         github = self.binary(target)

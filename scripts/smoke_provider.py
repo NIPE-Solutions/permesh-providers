@@ -50,8 +50,16 @@ def smoke(binary, provider='github'):
         fields = {field['key']: field for step in spec['steps'] for field in step['fields']}
         if provider == 'github' and fields.get('organizations', {}).get('input', {}).get('type') != 'string_list':
             raise ValueError('GitHub setup is missing organization selection')
-        if fields.get('token', {}).get('input', {}).get('type') != 'credential':
-            raise ValueError('GitHub setup is missing a token-reference question')
+        if provider != 'aws' and fields.get('token', {}).get('input', {}).get('type') != 'credential':
+            raise ValueError('Provider setup is missing a token-reference question')
+        if provider == 'aws':
+            expected_fields = {'account_id': ('text', True), 'region': ('text', True),
+                               'access_key_id': ('credential', True), 'secret_access_key': ('credential', True),
+                               'session_token': ('credential', False)}
+            if set(fields) != set(expected_fields) or any(
+                    fields[key].get('input', {}).get('type') != kind or fields[key].get('required') is not required
+                    for key, (kind, required) in expected_fields.items()):
+                raise ValueError('AWS setup must require account, region and key references with an optional session token')
         if provider == 'cloudflare' and fields.get('account_id', {}).get('input', {}).get('type') != 'text':
             raise RuntimeError('Cloudflare setup missing account ID')
         if provider == 'google' and any(fields.get(key, {}).get('input', {}).get('type') != kind for key, kind in [('customer_id', 'text'), ('auth_mode', 'choice'), ('client_id', 'text'), ('refresh_token', 'credential'), ('client_secret', 'credential')]):
