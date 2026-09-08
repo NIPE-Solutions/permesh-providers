@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 use aws_credential_types::Credentials;
 pub(crate) fn valid_credentials(c: &Credentials) -> bool {
     valid_values(c.access_key_id(), c.secret_access_key(), c.session_token())

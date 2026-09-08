@@ -69,8 +69,7 @@ repository or using Rust.
 
 ## License
 
-MIT OR Apache-2.0, at your option, except the Google adapter, which retains its
-[original MIT license](providers/google/LICENSE). Both repository license texts
-are in [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). Third-party dependencies retain their own licenses
+and required notices in distribution archives.
 
 Cloudflare account members, IAM groups and scoped policy assignments are implemented as a native provider. Source and mock/protocol tests are available; live qualification and catalog publication remain pending. Observations retain unknown effective privilege.

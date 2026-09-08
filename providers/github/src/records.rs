@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 //! Minimal API field validation and deduplicated domain record construction.
 use crate::client::List;
 use crate::{VISIBILITY, error};

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 //! AWS IAM policy attachment inventory. No effective IAM evaluation or ambient authentication.
 mod auth;
 pub mod protocol;

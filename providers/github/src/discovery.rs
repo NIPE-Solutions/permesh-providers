@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 //! GitHub organization graph traversal and lightweight authentication checks.
 use crate::client::Budget;
 use crate::records::{Collection, field, native_id, privilege, repository_role};

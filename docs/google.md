@@ -91,7 +91,7 @@ limits can be stricter. Cancellation drops active requests and retry waits.
 The API adapter and original HTTP contract tests were copied from Permesh commit
 `929ae3e2c69d0cd4cbfb2fdbfce6ed3085f36f69` without changing native IDs, identity
 status or primary-email semantics. Their MIT terms and copyright are retained in
-[the provider license](../providers/google/LICENSE). SDK/core/protocol/secrets
+[the repository license](../LICENSE). SDK/core/protocol/secrets
 remain pinned to the workspace's existing public revision. Shared protocol
 framing, request validation, deadlines, cancellation and output serialization are
 factored from the proven GitHub executable into `permesh-native-runtime`.

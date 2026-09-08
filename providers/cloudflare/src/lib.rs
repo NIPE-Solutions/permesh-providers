@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 //! Read-only Cloudflare IAM assignment evidence, never an effective-access evaluator.
 mod client;
 pub mod protocol;

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 //! AWS adapter for the shared native runtime. Credentials are explicit named references.
 use permesh_native_runtime::{Adapter, ProtocolFailure};
 use permesh_provider_sdk::{

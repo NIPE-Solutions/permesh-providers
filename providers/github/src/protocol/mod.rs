@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 //! Native GitHub provider protocol, using the shared bounded runtime.
 mod request;
 mod response;

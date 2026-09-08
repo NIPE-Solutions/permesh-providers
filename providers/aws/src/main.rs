@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 fn main() -> std::process::ExitCode {
     let runtime = match tokio::runtime::Builder::new_multi_thread()
         .worker_threads(2)

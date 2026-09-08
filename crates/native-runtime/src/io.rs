@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 use super::{Failure, MAX_FRAME};
 use serde::Serialize;
 use std::io::Write;

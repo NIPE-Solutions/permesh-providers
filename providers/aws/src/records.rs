@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 use super::*;
 use aws_sdk_iam::{
     operation::get_account_authorization_details::GetAccountAuthorizationDetailsOutput,

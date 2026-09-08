@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 use permesh_core::*;
 use permesh_native_runtime::{Adapter, serve};
 use permesh_provider_protocol::DiscoveryDecoder;

@@ -33,7 +33,7 @@ def workspace_license_root(package, directory, root):
     source = package.get('source') or ''
     if not source.startswith('git+https://github.com/NIPE-Solutions/permesh?rev='):
         return None
-    # Git SDK crates inherit the monorepo's dual license. Stop at its workspace
+    # Git SDK crates inherit their pinned monorepo's license. Stop at its workspace
     # manifest, not at an arbitrary file elsewhere on the build machine.
     for parent in list(directory.parents)[:4]:
         manifest = parent / 'Cargo.toml'

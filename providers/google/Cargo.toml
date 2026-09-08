@@ -3,7 +3,7 @@ name = "permesh-provider-google"
 version = "0.1.1"
 edition.workspace = true
 rust-version.workspace = true
-license = "MIT"
+license.workspace = true
 repository.workspace = true
 publish = false
 

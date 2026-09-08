@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 //! Thin provider-specific adapter for the shared native subprocess runtime.
 use crate::{CloudflareProvider, records};
 use permesh_native_runtime::Adapter;
