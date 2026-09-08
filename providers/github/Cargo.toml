@@ -24,4 +24,3 @@ zeroize.workspace = true
 [dev-dependencies]
 tempfile.workspace = true
 permesh-provider-protocol.workspace = true
-
