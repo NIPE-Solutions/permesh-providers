@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 //! Single-operation discovery, setup and optional browser-auth descriptions.
 mod io;
 mod records;

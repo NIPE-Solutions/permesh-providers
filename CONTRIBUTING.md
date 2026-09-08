@@ -33,5 +33,5 @@ observable limitations. Review catalog changes as software distribution changes:
 verify exact versions, origins, capabilities, checksums and compatibility. Do not
 list a provider before its artifacts are qualified.
 
-Contributions use MIT OR Apache-2.0. Retain original attribution and required
+Contributions use MIT. Retain original attribution and required
 third-party notices when moving code. See [LICENSE](LICENSE).

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 //! Bounded, read-only GitHub.com discovery. No provider-controlled URL is requested.
 mod client;
 mod discovery;

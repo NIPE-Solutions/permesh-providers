@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 //! Transport, bounded collection, retry policy, and same-endpoint pagination.
 use crate::records::safe_segment;
 use crate::{GithubProvider, MAX_BODY, MAX_PAGES, MAX_REQUESTS, MAX_ROWS, error};

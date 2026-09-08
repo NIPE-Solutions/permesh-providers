@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 #[cfg(test)]
 mod tests {
     use crate::client::{Budget, next_page, retry_delay};

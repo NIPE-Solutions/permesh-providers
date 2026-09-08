@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT OR Apache-2.0
+// SPDX-License-Identifier: MIT
 //! Bounded transport for official SDK requests; signing stays entirely in the SDK.
 use crate::{ProviderError, error};
 use aws_smithy_runtime_api::client::{
