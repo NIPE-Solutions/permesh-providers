@@ -10,10 +10,10 @@ from the services users configure. Permesh has no backend or telemetry.
 
 ## Status
 
-Repository foundation is in place. The versioned catalog is published at [catalog/v1.json](catalog/v1.json), with no
-releases listed until qualification passes. The GitHub adapter currently lives in the
-[Permesh workspace](https://github.com/NIPE-Solutions/permesh/tree/main/crates/providers).
-It will move here after external-provider parity and release qualification pass.
+The [GitHub provider](docs/github.md) has a native subprocess implementation under
+`providers/github`, with the original API contract tests and draft 2/3 integration.
+The versioned [catalog](catalog/v1.json) remains empty until all five native
+release candidates pass qualification.
 Existing built-in providers continue to work during that transition.
 
 Permesh already supports explicitly trusted external binaries, workspace approval,
@@ -46,6 +46,10 @@ repository or using Rust.
 
 ## Documentation
 
+- [GitHub permissions and coverage](docs/github.md)
+- [GitHub installation and setup](docs/github-setup.md)
+- [Dependency policy](docs/dependencies.md)
+- [Release qualification](docs/releasing.md)
 - [Catalog schema and archive layout](docs/catalog.md)
 - [Distribution and explicit updates](docs/distribution.md)
 - [Provider migration and release acceptance](docs/provider-lifecycle.md)

@@ -9,7 +9,7 @@ The CLI keeps the domain model, provider SDK, protocol, credential resolution an
 presentation. Providers normalize API responses and preserve access provenance;
 they do not own identity correlation or terminal formatting.
 
-Place the external implementation under `providers/github/` when migration begins.
+The external implementation and original API tests live under `providers/github/`.
 Use exact SDK/protocol revisions until published versions provide a dependable
 compatibility boundary. Do not add empty provider crates or catalog entries for
 providers without usable releases.
@@ -38,7 +38,8 @@ Release each provider independently. Use provider-specific tags such as
 `github-vVERSION`; document the concrete version and asset schema before the
 first release. Build from reviewed commits with least-privilege workflows and
 pinned build dependencies. Ordinary pull requests must not receive publication
-credentials. Publication privileges belong only to the explicit release job.
+credentials. Publication is an explicit maintainer operation after qualification; candidate
+workflows have no publication privileges. See [releasing](releasing.md).
 
 Publish native archives, checksums, release notes and applicable license notices.
 Qualify downloaded archives as well as build outputs. Add the release to the

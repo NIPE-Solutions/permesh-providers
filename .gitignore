@@ -1,4 +1,7 @@
 /target/
 /dist/
+/candidate-output/
+__pycache__/
+*.py[cod]
 *.local.yaml
 .DS_Store
