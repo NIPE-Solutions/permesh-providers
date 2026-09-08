@@ -1,0 +1,19 @@
+# Audit every platform in the locked dependency graph.
+[advisories]
+ignore = []
+
+[licenses]
+confidence-threshold = 0.93
+allow = ["MIT", "Apache-2.0", "BSD-3-Clause", "ISC", "Unicode-3.0", "CDLA-Permissive-2.0"]
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+required-git-spec = "rev"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = ["https://github.com/NIPE-Solutions/permesh"]
