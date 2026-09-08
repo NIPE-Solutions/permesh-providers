@@ -6,7 +6,6 @@ from pathlib import Path
 import re
 import stat
 import subprocess
-import tomllib
 import zipfile
 
 import provider_notices
@@ -50,15 +49,18 @@ def package(root, target, output, provider='github'):
     if target not in TARGETS:
         raise ValueError('unsupported target')
     root = Path(root).resolve(strict=True)
-    manifest = tomllib.loads(provider_notices.regular_bytes(root / 'Cargo.toml', 1024 * 1024).decode('utf-8'))
-    version = manifest['workspace']['package']['version']
+    metadata = cargo_metadata(root, target)
+    packages = [p for p in metadata['packages'] if p['name'] == f'permesh-provider-{provider}']
+    if len(packages) != 1:
+        raise ValueError('provider package metadata is missing or ambiguous')
+    version = packages[0]['version']
     if not isinstance(version, str) or re.fullmatch(r'(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)', version) is None:
         raise ValueError('provider release requires an exact stable semantic version')
     executable = f'permesh-provider-{provider}' + ('.exe' if 'windows' in target else '')
     binary = provider_notices.regular_bytes(root / 'target' / target / 'release' / executable, MAX_ARCHIVE_BYTES)
     if not native_matches(binary, target):
         raise ValueError('provider executable header does not match the target')
-    license_bytes = provider_notices.bundle(root, cargo_metadata(root, target), provider)
+    license_bytes = provider_notices.bundle(root, metadata, provider)
     output = Path(output).absolute()
     if any(parent.is_symlink() or parent.is_junction() for parent in (output, *output.parents)):
         raise ValueError('package output must not contain links or junctions')
