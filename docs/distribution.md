@@ -1,8 +1,8 @@
 # Provider distribution contract
 
-Status: accepted direction for the next implementation milestone. Catalog and
-package schemas, installation and update commands are not implemented yet.
-These requirements guide their implementation and acceptance tests.
+Status: catalog schema 1 and the initial package layout are defined in
+[catalog.md](catalog.md). The CLI implementation is being integrated separately;
+no provider release is listed until qualified.
 
 ## Ownership and catalog
 
@@ -47,11 +47,11 @@ Setup, validation hooks and provider binaries are never run by the installer.
 ## Versioned local storage and adoption
 
 Store verified versions side by side under platform-appropriate local application
-data directories. This requires extending the current single-registration model
-before implementing updates. A new download must not overwrite an executable
+data directories. The CLI retains previously trusted digests separately from downloaded packages. A new download must not overwrite an executable
 used by an existing workspace or remove its locally approved version.
 
-An update can select a new version for future setup, but must leave existing
+An update downloads a new version; explicit trust selects it for future setup.
+It must leave existing
 workspace pins, configuration and execution approvals unchanged. Adopting that
 version in a workspace requires an explicit, reviewable pin change and approval
 for the new digest and configuration. Provider capabilities cannot silently expand
