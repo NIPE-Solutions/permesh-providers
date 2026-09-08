@@ -17,9 +17,8 @@ It will move here after external-provider parity and release qualification pass.
 Existing built-in providers continue to work during that transition.
 
 Permesh already supports explicitly trusted external binaries, workspace approval,
-credential delivery and declarative setup. Catalog installation and explicit updates are implemented in the CLI development
-branch and will become available when that change lands. No downloadable provider
-release is available yet:
+credential delivery and declarative setup. Catalog installation and explicit updates are implemented on the CLI development
+main branch. No downloadable provider release is available yet:
 
 ```bash
 permesh provider install github --version VERSION

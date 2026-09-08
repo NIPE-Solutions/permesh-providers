@@ -1,7 +1,7 @@
 # Provider distribution contract
 
 Status: catalog schema 1 and the initial package layout are defined in
-[catalog.md](catalog.md). The CLI implementation is being integrated separately;
+[catalog.md](catalog.md). The CLI implementation is available on its development main branch;
 no provider release is listed until qualified.
 
 ## Ownership and catalog
