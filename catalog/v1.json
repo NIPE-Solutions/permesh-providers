@@ -1,4 +1,100 @@
 {
   "schema_version": 1,
-  "releases": []
+  "releases": [
+    {
+      "archive_sha256": "19a87dde8945f288ca97504bbae04586aa68611027b09fff558806454492611d",
+      "archive_size": 2388566,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "executable_sha256": "51c250878a52f01537e0015e1003bc62e8816b26f6168d83217f0f30fdfac9dd",
+      "protocols": [
+        2,
+        3
+      ],
+      "provider": "github",
+      "target": "aarch64-apple-darwin",
+      "version": "0.1.0"
+    },
+    {
+      "archive_sha256": "26bb4df19f08dbe3478cb11732b4055acbbb965435fbc2ac4e2d7af7cf4c94d9",
+      "archive_size": 2412227,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "executable_sha256": "ab4587fe9bc14f92d672ed2efc3cbdb0293154ec7d863451b5aeec86ab1bb45e",
+      "protocols": [
+        2,
+        3
+      ],
+      "provider": "github",
+      "target": "aarch64-unknown-linux-gnu",
+      "version": "0.1.0"
+    },
+    {
+      "archive_sha256": "bf872ccd6513dec51f3a0fc25f56e146c132127190e3df3a403a3c02c48ca742",
+      "archive_size": 2556709,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "executable_sha256": "865192660a814cdc909cbc6eea3b51d779c0db6d38bb8152ca23169165cd8fdb",
+      "protocols": [
+        2,
+        3
+      ],
+      "provider": "github",
+      "target": "x86_64-apple-darwin",
+      "version": "0.1.0"
+    },
+    {
+      "archive_sha256": "8ed4aaa767e746beeece718cd14b4e273d8e913ccadbc9e6de48994bdd6c7135",
+      "archive_size": 2219745,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "executable_sha256": "db2be7172c84fafe799b7e244cc9d2c18b07883032213ca93888cebe3cdfd3a7",
+      "protocols": [
+        2,
+        3
+      ],
+      "provider": "github",
+      "target": "x86_64-pc-windows-msvc",
+      "version": "0.1.0"
+    },
+    {
+      "archive_sha256": "4e936f4a477babc4c99004d3fab33eb7923f1ce6572f522a8bb86c03ae6e328d",
+      "archive_size": 2595172,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "executable_sha256": "34282dfc87d24c52c1c2100676f7b0516ada602f771d197bbdc2746143d2c947",
+      "protocols": [
+        2,
+        3
+      ],
+      "provider": "github",
+      "target": "x86_64-unknown-linux-gnu",
+      "version": "0.1.0"
+    }
+  ]
 }

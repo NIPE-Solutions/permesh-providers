@@ -2,9 +2,9 @@
 
 ## First migration: GitHub
 
-The existing GitHub adapter remains available in the Permesh CLI while an external
-package is qualified. Move its implementation and tests with source provenance
-preserved; do not replace a working adapter with a new untested implementation.
+The GitHub implementation and tests moved here with source provenance preserved.
+Its first independently packaged release has a [qualification record](releases/github-0.1.0.md).
+Do not replace a working adapter with a new untested implementation.
 The CLI keeps the domain model, provider SDK, protocol, credential resolution and
 presentation. Providers normalize API responses and preserve access provenance;
 they do not own identity correlation or terminal formatting.
