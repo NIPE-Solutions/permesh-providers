@@ -8,7 +8,7 @@ The first version is `0.1.0`. This is separate from the CLI's release version.
 
 Open a pull request with source, tests, lockfile, permission/limitation docs and
 release notes ready for review. CI runs formatting, strict Clippy, tests on Linux,
-macOS and Windows, the declared Rust 1.91 minimum, and dependency checks. Native
+macOS and Windows, the declared Rust 1.94.1 minimum, and dependency checks. Native
 candidate jobs test and build on each target's native runner with locked Cargo
 dependencies; they do not cross-compile or use live provider credentials.
 

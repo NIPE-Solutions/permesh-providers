@@ -44,5 +44,5 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - run: rustup toolchain install 1.91.0 --profile minimal
-      - run: cargo +1.91.0 check --workspace --all-targets --locked
+      - run: rustup toolchain install 1.94.1 --profile minimal
+      - run: cargo +1.94.1 check --workspace --all-targets --locked
