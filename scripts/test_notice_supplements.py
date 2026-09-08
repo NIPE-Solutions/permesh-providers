@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import tempfile
 import unittest
 import provider_notices
@@ -63,3 +64,14 @@ class SupplementTests(unittest.TestCase):
         (self.root / self.entry['notice_file']).write_text('Substituted notice')
         with self.assertRaises(ValueError):
             provider_notices.notice_files(self.package, self.root)
+
+    def test_git_windows_checkout_preserves_reviewed_notice_bytes(self):
+        attributes = Path(__file__).resolve().parents[1] / '.gitattributes'
+        if attributes.exists():
+            shutil.copyfile(attributes, self.root / '.gitattributes')
+        subprocess.run(['git', 'init', '--quiet', str(self.root)], check=True, capture_output=True)
+        path = self.entry['notice_file']
+        subprocess.run(['git', '-C', str(self.root), '-c', 'core.autocrlf=false', 'add', '--', path], check=True, capture_output=True)
+        (self.root / path).unlink()
+        subprocess.run(['git', '-C', str(self.root), '-c', 'core.autocrlf=true', 'checkout-index', '--force', '--', path], check=True, capture_output=True)
+        provider_notices.notice_files(self.package, self.root)

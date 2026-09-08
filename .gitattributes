@@ -1,0 +1,2 @@
+# Upstream notice digests bind exact bytes; disable platform newline conversion.
+third-party/licenses/* -text
