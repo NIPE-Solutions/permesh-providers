@@ -1538,8 +1538,8 @@ checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 
 [[package]]
 name = "permesh-core"
-version = "0.1.0-dev"
-source = "git+https://github.com/NIPE-Solutions/permesh?rev=0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c#0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/NIPE-Solutions/permesh?rev=ca84b7332f33d45e506374df019bda1eba0b8c8b#ca84b7332f33d45e506374df019bda1eba0b8c8b"
 dependencies = [
  "serde",
  "thiserror",
@@ -1618,7 +1618,7 @@ dependencies = [
 
 [[package]]
 name = "permesh-provider-google"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "bytes",
  "permesh-core",
@@ -1638,8 +1638,8 @@ dependencies = [
 
 [[package]]
 name = "permesh-provider-protocol"
-version = "0.1.0-dev"
-source = "git+https://github.com/NIPE-Solutions/permesh?rev=0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c#0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/NIPE-Solutions/permesh?rev=ca84b7332f33d45e506374df019bda1eba0b8c8b#ca84b7332f33d45e506374df019bda1eba0b8c8b"
 dependencies = [
  "permesh-core",
  "permesh-provider-sdk",
@@ -1650,19 +1650,20 @@ dependencies = [
 
 [[package]]
 name = "permesh-provider-sdk"
-version = "0.1.0-dev"
-source = "git+https://github.com/NIPE-Solutions/permesh?rev=0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c#0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/NIPE-Solutions/permesh?rev=ca84b7332f33d45e506374df019bda1eba0b8c8b#ca84b7332f33d45e506374df019bda1eba0b8c8b"
 dependencies = [
  "permesh-core",
  "serde",
  "serde_json",
  "thiserror",
+ "url",
 ]
 
 [[package]]
 name = "permesh-secrets"
-version = "0.1.0-dev"
-source = "git+https://github.com/NIPE-Solutions/permesh?rev=0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c#0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c"
+version = "0.1.0-alpha.1"
+source = "git+https://github.com/NIPE-Solutions/permesh?rev=ca84b7332f33d45e506374df019bda1eba0b8c8b#ca84b7332f33d45e506374df019bda1eba0b8c8b"
 dependencies = [
  "keyring",
  "secrecy",

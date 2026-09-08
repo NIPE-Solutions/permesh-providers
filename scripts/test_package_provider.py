@@ -62,6 +62,15 @@ class PackageTests(unittest.TestCase):
         binary.write_bytes(native(target))
         return binary
 
+    def test_package_version_follows_selected_provider_metadata(self):
+        target = package.TARGETS[0]
+        self.binary(target)
+        self.metadata['packages'][0]['version'] = '0.2.0'
+        archive = package.package(self.root, target, self.root / 'out')
+        self.assertEqual(archive.name, f'permesh-provider-github-0.2.0-{target}.zip')
+        self.assertEqual(json.loads((archive.parent / 'catalog-entry.json').read_text())['version'], '0.2.0')
+        verify_package.verify(archive, archive.parent / 'catalog-entry.json')
+
     def test_deterministic_two_file_zip_and_bound_metadata_for_every_target(self):
         for target in package.TARGETS:
             with self.subTest(target=target):

@@ -35,6 +35,7 @@ pub(super) enum Command<A: Adapter> {
         credentials: A::Credentials,
     },
     Describe,
+    DescribeAuth,
     Cancel,
 }
 pub(super) fn valid_instance(value: &str) -> bool {
@@ -49,7 +50,7 @@ pub(super) fn parse<A: Adapter>(bytes: &[u8]) -> Result<Request<A>, ()> {
         return Err(());
     }
     let value: WireRequest<A> = serde_json::from_slice(bytes).map_err(|_| ())?;
-    if !matches!(value.protocol, 2 | 3) || value.id != value.method {
+    if !matches!(value.protocol, 2..=4) || value.id != value.method {
         return Err(());
     }
     let command = match value.method.as_str() {
@@ -67,6 +68,14 @@ pub(super) fn parse<A: Adapter>(bytes: &[u8]) -> Result<Request<A>, ()> {
                 && value.credentials.is_none() =>
         {
             Command::Describe
+        }
+        "describe_auth"
+            if value.protocol == 4
+                && value.instance.is_none()
+                && value.configuration.is_none()
+                && value.credentials.is_none() =>
+        {
+            Command::DescribeAuth
         }
         "cancel"
             if value.instance.is_none()

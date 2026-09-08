@@ -3,6 +3,9 @@
 GitHub provider releases use the tag `github-vVERSION` and five native targets:
 macOS ARM64 and Intel, Linux GNU ARM64 and x86_64, and Windows x86_64 MSVC.
 The first version is `0.1.0`. This is separate from the CLI's release version.
+The packager uses the selected provider's resolved Cargo package version; a
+provider may override the workspace default to release independently. Never
+reuse a published provider/version pair for changed executable bytes.
 
 ## Qualification
 

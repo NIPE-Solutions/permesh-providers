@@ -153,3 +153,42 @@ an existing built-in directory; do not create a duplicate instance just to chang
 its implementation. Setup never resolves credentials or approves the workspace.
 
 Use `--authoritative` only when this directory is a reviewed identity source of truth. Omitting it still discovers accounts, but the CLI will not treat directory status as authoritative for orphan review. Migration preserves the original authority declaration rather than choosing one automatically.
+
+## Browser login (0.1.1 source)
+
+The 0.1.1 source adds an optional draft 4 authentication description. It requires
+an updated CLI with `auth login --browser`; the 0.1.0 provider and CLI alpha.1 do
+not implement that flow. Draft 2 discovery and draft 3 setup remain unchanged.
+Catalog protocol entries describe discovery/setup compatibility; optional browser
+authentication is negotiated separately and fails closed on older executables.
+
+Create your own **Desktop app** OAuth client in Google Cloud, enable the Admin SDK,
+and configure its consent audience for the Workspace administrators who will use
+Permesh. Permesh has no shared OAuth client or backend. Google documents client
+creation and the loopback/PKCE flow in its [native-app guide](https://developers.google.com/identity/protocols/oauth2/native-app).
+
+Use refresh-token setup with that client's ID, a `client_secret` reference, and
+`keychain://directory/refresh_token` as the refresh-token reference. Store the
+client secret through the existing hidden credential prompt. Review and approve
+the exact workspace and executable before requesting browser authentication:
+
+```sh
+permesh auth login directory --credential client_secret
+permesh provider external review directory
+permesh provider external approve directory --fingerprint REVIEWED_FINGERPRINT --accept-risk
+permesh auth login directory --browser
+permesh doctor
+```
+
+The provider declares only Google's fixed authorization/token endpoints, the
+Directory user-readonly scope, and references to existing configuration fields
+and credential slots. The CLI owns the local callback, state and PKCE validation,
+code exchange and keychain write. No credential is sent to the provider while
+requesting its authentication description. Ordinary access queries neither open
+a browser nor write a new refresh credential. Access-token-only configuration is
+not silently converted; configure refresh mode explicitly first.
+
+Google's consent screen and account policy still determine whether authorization
+is allowed. App verification, test-user restrictions and administrator consent
+remain Google-side prerequisites. Local synthetic OAuth tests are not a completed
+live Google authorization or tenant-visibility qualification.
