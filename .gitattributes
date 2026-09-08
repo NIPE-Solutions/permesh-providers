@@ -1,2 +1,5 @@
 # Upstream notice digests bind exact bytes; disable platform newline conversion.
 third-party/licenses/* -text
+
+# Protocol golden files are byte contracts, including LF framing.
+*.ndjson text eol=lf
