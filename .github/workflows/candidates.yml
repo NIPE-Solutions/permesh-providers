@@ -55,7 +55,7 @@ jobs:
           BINARY_SUFFIX: ${{ matrix.suffix }}
         run: |
           mkdir candidate-output
-          for provider in github google cloudflare; do
+          for provider in github google cloudflare aws; do
             cargo build --release --locked --package "permesh-provider-$provider" --bin "permesh-provider-$provider" --target "$TARGET"
             python scripts/smoke_provider.py --provider "$provider" "target/$TARGET/release/permesh-provider-$provider$BINARY_SUFFIX"
             python scripts/package_provider.py --provider "$provider" --target "$TARGET" --output "candidate-output/$provider"

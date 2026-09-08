@@ -33,6 +33,12 @@ Google Workspace Directory is available as an unpublished native candidate with
 access-token and refresh-token authentication. See [Google setup, permissions and
 coverage](docs/google.md).
 
+AWS IAM attachment inventory is available as an unpublished native candidate with
+explicit access-key and optional session-token references. Attachments retain
+unknown effective privilege. See [AWS source](providers/aws) and
+[authentication, permissions and limits](docs/aws.md). Live qualification and
+catalog publication remain pending.
+
 ## Repository responsibilities
 
 - Provider source, synthetic fixtures, API contract tests and limitations.
@@ -47,6 +53,7 @@ repository or using Rust.
 
 ## Documentation
 
+- [AWS IAM authentication and attachment evidence](docs/aws.md)
 - [Google Directory authentication and coverage](docs/google.md)
 - [Cloudflare IAM observations and limits](docs/cloudflare.md)
 - [GitHub permissions and coverage](docs/github.md)
