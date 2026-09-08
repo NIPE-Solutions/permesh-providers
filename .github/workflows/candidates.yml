@@ -16,19 +16,19 @@ jobs:
         include:
           - os: macos-15
             target: aarch64-apple-darwin
-            binary: permesh-provider-github
+            suffix: ''
           - os: macos-15-intel
             target: x86_64-apple-darwin
-            binary: permesh-provider-github
+            suffix: ''
           - os: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
-            binary: permesh-provider-github
+            suffix: ''
           - os: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
-            binary: permesh-provider-github
+            suffix: ''
           - os: windows-2025
             target: x86_64-pc-windows-msvc
-            binary: permesh-provider-github.exe
+            suffix: .exe
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -48,22 +48,27 @@ jobs:
           test "$(rustc -vV | sed -n 's/^host: //p')" = "$EXPECTED_TARGET"
       - run: cargo test --workspace --locked --target ${{ matrix.target }}
       - run: python -m unittest discover -s scripts -p 'test_*.py'
-      - run: cargo build --release --locked --package permesh-provider-github --bin permesh-provider-github --target ${{ matrix.target }}
-      - name: Exercise actual native description without credentials
-        run: python scripts/smoke_provider.py target/${{ matrix.target }}/release/${{ matrix.binary }}
-      - name: Package native binary and complete source license notices
-        run: python scripts/package_provider.py --target ${{ matrix.target }} --output candidate-output
-      - name: Verify ZIP profile and catalog digests
+      - name: Build, smoke and package each native provider
         shell: bash
-        run: python scripts/verify_package.py candidate-output/*.zip --entry candidate-output/catalog-entry.json
+        env:
+          TARGET: ${{ matrix.target }}
+          BINARY_SUFFIX: ${{ matrix.suffix }}
+        run: |
+          mkdir candidate-output
+          for provider in github google; do
+            cargo build --release --locked --package "permesh-provider-$provider" --bin "permesh-provider-$provider" --target "$TARGET"
+            python scripts/smoke_provider.py --provider "$provider" "target/$TARGET/release/permesh-provider-$provider$BINARY_SUFFIX"
+            python scripts/package_provider.py --provider "$provider" --target "$TARGET" --output "candidate-output/$provider"
+            python scripts/verify_package.py candidate-output/"$provider"/*.zip --entry "candidate-output/$provider/catalog-entry.json"
+          done
       - name: Retain unsigned candidate for release review
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: permesh-provider-github-${{ matrix.target }}-${{ github.sha }}
+          name: permesh-providers-${{ matrix.target }}-${{ github.sha }}
           path: |
-            candidate-output/*.zip
-            candidate-output/*.sha256
-            candidate-output/catalog-entry.json
+            candidate-output/**/*.zip
+            candidate-output/**/*.sha256
+            candidate-output/**/catalog-entry.json
           if-no-files-found: error
           retention-days: 7
           compression-level: 0

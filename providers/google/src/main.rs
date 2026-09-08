@@ -8,7 +8,7 @@ fn main() -> std::process::ExitCode {
         Ok(runtime) => runtime,
         Err(_) => return std::process::ExitCode::from(1),
     };
-    let result = runtime.block_on(permesh_provider_github::protocol::run(
+    let result = runtime.block_on(permesh_provider_google::protocol::run(
         tokio::io::stdin(),
         tokio::io::stdout(),
     ));
