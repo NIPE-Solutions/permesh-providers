@@ -139,7 +139,7 @@ answers:
 ```
 
 ```sh
-permesh provider setup google --id directory --answers answers.yaml
+permesh provider setup google --id directory --answers answers.yaml --authoritative
 permesh auth login directory --credential refresh_token
 permesh auth login directory --credential client_secret
 permesh provider external review directory
@@ -151,3 +151,5 @@ Trust and workspace approval are separate explicit decisions. Native providers
 run with your user permissions. Preserve the existing instance ID when migrating
 an existing built-in directory; do not create a duplicate instance just to change
 its implementation. Setup never resolves credentials or approves the workspace.
+
+Use `--authoritative` only when this directory is a reviewed identity source of truth. Omitting it still discovers accounts, but the CLI will not treat directory status as authoritative for orphan review. Migration preserves the original authority declaration rather than choosing one automatically.
