@@ -120,7 +120,7 @@ where
         }
         Command::DescribeAuth => {
             output.id = "describe_auth";
-            let spec = A::browser_auth().ok_or(Failure::Provider("unsupported"))?;
+            let spec = A::browser_auth().ok_or(Failure::Provider("unsupported_method"))?;
             spec.validate().map_err(|_| Failure::Internal)?;
             output
                 .send(&serde_json::json!({"event":"auth","spec":spec}))
