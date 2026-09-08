@@ -13,7 +13,7 @@ import provider_notices
 
 TARGETS = ('aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'aarch64-unknown-linux-gnu', 'x86_64-pc-windows-msvc')
 CAPABILITIES = ['accounts', 'resources', 'groups', 'memberships', 'grants']
-PROVIDERS = {'github': CAPABILITIES, 'google': ['accounts', 'identities']}
+PROVIDERS = {'github': CAPABILITIES, 'google': ['accounts', 'identities'], 'cloudflare': CAPABILITIES}
 MAX_ARCHIVE_BYTES = 128 * 1024 * 1024
 
 

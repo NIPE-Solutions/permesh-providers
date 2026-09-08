@@ -48,6 +48,7 @@ repository or using Rust.
 ## Documentation
 
 - [Google Directory authentication and coverage](docs/google.md)
+- [Cloudflare IAM observations and limits](docs/cloudflare.md)
 - [GitHub permissions and coverage](docs/github.md)
 - [GitHub installation and setup](docs/github-setup.md)
 - [Dependency policy](docs/dependencies.md)
@@ -64,3 +65,5 @@ repository or using Rust.
 MIT OR Apache-2.0, at your option, except the Google adapter, which retains its
 [original MIT license](providers/google/LICENSE). Both repository license texts
 are in [LICENSE](LICENSE).
+
+Cloudflare account members, IAM groups and scoped policy assignments are implemented as a native provider. Source and mock/protocol tests are available; live qualification and catalog publication remain pending. Observations retain unknown effective privilege.

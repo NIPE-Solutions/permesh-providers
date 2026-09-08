@@ -52,6 +52,8 @@ def smoke(binary, provider='github'):
             raise ValueError('GitHub setup is missing organization selection')
         if fields.get('token', {}).get('input', {}).get('type') != 'credential':
             raise ValueError('GitHub setup is missing a token-reference question')
+        if provider == 'cloudflare' and fields.get('account_id', {}).get('input', {}).get('type') != 'text':
+            raise RuntimeError('Cloudflare setup missing account ID')
         if provider == 'google' and any(fields.get(key, {}).get('input', {}).get('type') != kind for key, kind in [('customer_id', 'text'), ('auth_mode', 'choice'), ('client_id', 'text'), ('refresh_token', 'credential'), ('client_secret', 'credential')]):
             raise ValueError('Google setup is missing a required authentication question')
         if list(Path(directory).iterdir()):

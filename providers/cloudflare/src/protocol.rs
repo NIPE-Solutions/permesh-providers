@@ -29,11 +29,33 @@ impl Adapter for Cloudflare {
         crate::provider_metadata()
     }
     fn setup() -> SetupSpec {
-        SetupSpec{schema_version:1,title:"Cloudflare account".into(),description:"Read account members, IAM groups, policy assignments and visible zones. Assignments retain unknown effective privilege.".into(),steps:vec![SetupStep{id:"connection".into(),title:"Account connection".into(),description:"Use Account Settings Read and Zone Read scoped to the intended account and zones.".into(),when:None,fields:vec![
- SetupField{key:"account_id".into(),label:"Account ID".into(),help:"Cloudflare account ID: 32 lowercase hexadecimal characters.".into(),required:true,default:None,when:None,input:Input::Text{min_length:32,max_length:32}},
- SetupField{key:"token".into(),label:"API token reference".into(),help:"Use env://NAME or keychain://INSTANCE/token. Supply an account-owned or user API token through a secret reference.".into(),required:true,default:None,when:None,input:Input::Credential},
- ]}]}
+        SetupSpec {
+            schema_version: 1,
+            title: "Cloudflare account".into(),
+            description: "Read account members, IAM groups, policy assignments and visible zones. Assignments retain unknown effective privilege.".into(),
+            steps: vec![SetupStep {
+                id: "connection".into(),
+                title: "Account connection".into(),
+                description: "Use Account Settings Read and Zone Read scoped to the intended account and zones.".into(),
+                when: None,
+                fields: vec![
+                    SetupField {
+                        key: "account_id".into(), label: "Account ID".into(),
+                        help: "Cloudflare account ID: 32 lowercase hexadecimal characters.".into(),
+                        required: true, default: None, when: None,
+                        input: Input::Text { min_length: 32, max_length: 32 },
+                    },
+                    SetupField {
+                        key: "token".into(), label: "API token reference".into(),
+                        help: "Use env://NAME or keychain://INSTANCE/token. Supply an account-owned or user API token through a secret reference.".into(),
+                        required: true, default: None, when: None,
+                        input: Input::Credential,
+                    },
+                ],
+            }],
+        }
     }
+
     fn validate(configuration: &Configuration, credentials: &Credentials) -> bool {
         records::native_id(&configuration.account_id)
             && !credentials.token.is_empty()
