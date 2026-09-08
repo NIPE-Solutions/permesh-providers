@@ -1,0 +1,8 @@
+{"protocol":2,"id":"handshake","capabilities":["accounts","identities","resources","groups","memberships","grants"],"draft":true,"event":"handshake","provider":"fixture"}
+{"protocol":2,"id":"discover","event":"record","kind":"account","data":{"key":{"provider":"test","id":"account"},"login":"alice","kind":"human","verified_emails":["alice@example.com"]}}
+{"protocol":2,"id":"discover","event":"record","kind":"identity","data":{"id":"directory:alice","kind":"unknown","status":"active","verified_emails":["alice@example.com"]}}
+{"protocol":2,"id":"discover","event":"record","kind":"resource","data":{"key":{"provider":"test","id":"resource"},"name":"Repository"}}
+{"protocol":2,"id":"discover","event":"record","kind":"group","data":{"key":{"provider":"test","id":"group"},"name":"Engineering"}}
+{"protocol":2,"id":"discover","event":"record","kind":"membership","data":{"member":{"kind":"account","key":{"provider":"test","id":"account"}},"group":{"provider":"test","id":"group"},"provenance":{"method":"fixture.membership","observed_at":"2026-01-01T00:00:00Z"}}}
+{"protocol":2,"id":"discover","event":"record","kind":"grant","data":{"id":"grant","subject":{"kind":"group","key":{"provider":"test","id":"group"}},"resource":{"provider":"test","id":"resource"},"role":"write","privilege":"elevated","certainty":"observed","provenance":{"method":"fixture.grant","observed_at":"2026-01-01T00:00:00Z"}}}
+{"protocol":2,"id":"discover","complete":true,"count":6,"event":"complete","limitations":[]}

@@ -94,6 +94,9 @@ fn error(code: &str) -> ProviderError {
             "discovery" => {
                 "No configured GitHub organization could be collected; check credentials and access."
             }
+            "conflict" => {
+                "Conflicting observations for the same native entity or grant were excluded with their dependent claims."
+            }
             "clock" => "Observation time could not be formatted.",
             _ => "GitHub returned an unsuccessful response.",
         },

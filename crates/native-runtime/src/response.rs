@@ -6,21 +6,20 @@ use serde::Serialize;
 use tokio::io::AsyncWrite;
 
 #[derive(Serialize)]
-struct Record<'a, T> {
+struct Record {
     event: &'static str,
-    kind: &'static str,
-    data: &'a T,
+    #[serde(flatten)]
+    record: permesh_provider_protocol::records::Record,
 }
-async fn records<W: AsyncWrite + Unpin, T: Serialize>(
+async fn records<W: AsyncWrite + Unpin, T>(
     out: &mut Output<W>,
-    kind: &'static str,
     values: &[T],
+    convert: fn(&T) -> permesh_provider_protocol::records::Record,
 ) -> Result<(), Failure> {
     for data in values {
         out.send(&Record {
             event: "record",
-            kind,
-            data,
+            record: convert(data),
         })
         .await?;
     }
@@ -51,12 +50,12 @@ pub(super) async fn operation<A: Adapter, P: Provider, W: AsyncWrite + Unpin>(
         if count > 100_000 {
             return Err(Failure::Internal);
         }
-        records(out, "account", &snapshot.accounts).await?;
-        records(out, "identity", &snapshot.identities).await?;
-        records(out, "resource", &snapshot.resources).await?;
-        records(out, "group", &snapshot.groups).await?;
-        records(out, "membership", &snapshot.memberships).await?;
-        records(out, "grant", &snapshot.grants).await?;
+        records(out, &snapshot.accounts, crate::records::account).await?;
+        records(out, &snapshot.identities, crate::records::identity).await?;
+        records(out, &snapshot.resources, crate::records::resource).await?;
+        records(out, &snapshot.groups, crate::records::group).await?;
+        records(out, &snapshot.memberships, crate::records::membership).await?;
+        records(out, &snapshot.grants, crate::records::grant).await?;
         out.send(&serde_json::json!({"event":"complete","count":count,"complete":snapshot.complete,"limitations":A::limitations(&snapshot.limitations)})).await
     }
 }

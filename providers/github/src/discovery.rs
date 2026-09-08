@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //! GitHub organization graph traversal and lightweight authentication checks.
 use crate::client::Budget;
-use crate::records::{Collection, field, native_id, privilege, repository_role, safe_segment};
+use crate::records::{Collection, field, native_id, privilege, repository_role};
 use crate::{GithubProvider, MAX_REQUESTS, MAX_ROWS, VISIBILITY, error};
 use permesh_core::*;
 use permesh_provider_sdk::{Capability, Health, Metadata, Provider, ProviderError, ProviderFuture};
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
 impl GithubProvider {
     async fn collect(&self) -> Result<Snapshot, ProviderError> {
@@ -77,32 +77,13 @@ impl GithubProvider {
                 }
             }
             let list = self.list(&["orgs", org, "teams"], &[], &mut budget).await;
-            let mut seen_teams = BTreeSet::new();
             for team in state.accept("teams", list) {
-                let (Some(id), Some(slug), Some(name)) =
-                    (native_id(&team), field(&team, "slug"), field(&team, "name"))
-                else {
-                    state.fail("teams", error("malformed"));
+                let Some((key, slug)) = state.team(&team, org) else {
                     continue;
                 };
-                if !safe_segment(slug) {
-                    state.fail("teams", error("malformed"));
-                    continue;
-                }
-                if !seen_teams.insert(id) {
-                    continue;
-                }
-                let key = state.key("team", id);
-                state.groups.insert(
-                    key.clone(),
-                    Group {
-                        key: key.clone(),
-                        name: format!("{org}/{name}"),
-                    },
-                );
                 let list = self
                     .list(
-                        &["orgs", org, "teams", slug, "members"],
+                        &["orgs", org, "teams", &slug, "members"],
                         &[("role", "all")],
                         &mut budget,
                     )
@@ -117,12 +98,12 @@ impl GithubProvider {
                     }
                 }
                 let list = self
-                    .list(&["orgs", org, "teams", slug, "repos"], &[], &mut budget)
+                    .list(&["orgs", org, "teams", &slug, "repos"], &[], &mut budget)
                     .await;
                 for repo in state.accept("team repositories", list) {
                     if let Some((resource, owner, name)) = state.repository(&repo) {
                         let permissions = match self
-                            .url(&["orgs", org, "teams", slug, "repos", &owner, &name], &[])
+                            .url(&["orgs", org, "teams", &slug, "repos", &owner, &name], &[])
                         {
                             Ok(url) => match self
                                 .get_media(

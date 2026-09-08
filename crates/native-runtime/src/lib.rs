@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 //! Single-operation discovery, setup and optional browser-auth descriptions.
 mod io;
+mod records;
 mod request;
 mod response;
 
@@ -104,7 +105,13 @@ where
     let Command::Handshake { instance } = request.command else {
         return Err(Failure::Protocol);
     };
-    output.send(&serde_json::json!({"event":"handshake","provider":A::metadata().kind,"capabilities":A::metadata().capabilities,"draft":true})).await?;
+    let metadata = A::metadata();
+    let capabilities: Vec<_> = metadata
+        .capabilities
+        .into_iter()
+        .map(records::capability)
+        .collect();
+    output.send(&serde_json::json!({"event":"handshake","provider":metadata.kind,"capabilities":capabilities,"draft":true})).await?;
     let request = next::<A, _>(input).await?;
     if request.protocol != output.version {
         return Err(Failure::Protocol);
