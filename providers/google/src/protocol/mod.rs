@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 //! Native Google Directory provider protocol.
+mod browser_auth;
 mod setup;
 use crate::{GoogleProvider, auth};
 use permesh_native_runtime::Adapter;
@@ -47,6 +48,9 @@ impl Adapter for Google {
     }
     fn setup() -> SetupSpec {
         setup::spec()
+    }
+    fn browser_auth() -> Option<permesh_provider_sdk::browser_auth::BrowserAuthSpec> {
+        Some(browser_auth::spec())
     }
     fn validate(config: &Configuration, credentials: &Credentials) -> bool {
         let customer = &config.customer_id;

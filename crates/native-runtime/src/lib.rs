@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
-//! Single-operation draft2 discovery/health and draft3 setup description.
+//! Single-operation discovery, setup and optional browser-auth descriptions.
 mod io;
 mod request;
 mod response;
 
 use io::{Input, Output};
 use permesh_provider_sdk::ProviderError;
-use permesh_provider_sdk::{Metadata, Provider, setup::SetupSpec};
+use permesh_provider_sdk::{Metadata, Provider, browser_auth::BrowserAuthSpec, setup::SetupSpec};
 use request::Command;
 use serde::de::DeserializeOwned;
 use std::future::Future;
@@ -118,6 +118,14 @@ where
                 .send(&serde_json::json!({"event":"setup","spec":spec}))
                 .await
         }
+        Command::DescribeAuth => {
+            output.id = "describe_auth";
+            let spec = A::browser_auth().ok_or(Failure::Provider("unsupported"))?;
+            spec.validate().map_err(|_| Failure::Internal)?;
+            output
+                .send(&serde_json::json!({"event":"auth","spec":spec}))
+                .await
+        }
         Command::Cancel => Err(Failure::Cancelled),
         Command::Operation {
             check,
@@ -149,6 +157,10 @@ pub trait Adapter {
     type Credentials: DeserializeOwned;
     fn metadata() -> Metadata;
     fn setup() -> SetupSpec;
+    /// Optional credential-free description; login and keychain writes belong to the host.
+    fn browser_auth() -> Option<BrowserAuthSpec> {
+        None
+    }
     fn validate(configuration: &Self::Configuration, credentials: &Self::Credentials) -> bool;
     fn error_code(code: &str) -> &'static str;
     fn limitations(values: &[String]) -> Vec<&'static str>;

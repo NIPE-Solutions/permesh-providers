@@ -17,10 +17,10 @@ reqwest = { version = "0.13", default-features = false, features = ["rustls", "j
 time = { version = "0.3", features = ["formatting", "serde", "parsing"] }
 tempfile = "3"
 zeroize = { version = "1.8", features = ["serde"] }
-permesh-core = { git = "https://github.com/NIPE-Solutions/permesh", rev = "0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c" }
-permesh-provider-sdk = { git = "https://github.com/NIPE-Solutions/permesh", rev = "0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c" }
-permesh-secrets = { git = "https://github.com/NIPE-Solutions/permesh", rev = "0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c" }
-permesh-provider-protocol = { git = "https://github.com/NIPE-Solutions/permesh", rev = "0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c" }
+permesh-core = { git = "https://github.com/NIPE-Solutions/permesh", rev = "ca84b7332f33d45e506374df019bda1eba0b8c8b" }
+permesh-provider-sdk = { git = "https://github.com/NIPE-Solutions/permesh", rev = "ca84b7332f33d45e506374df019bda1eba0b8c8b" }
+permesh-secrets = { git = "https://github.com/NIPE-Solutions/permesh", rev = "ca84b7332f33d45e506374df019bda1eba0b8c8b" }
+permesh-provider-protocol = { git = "https://github.com/NIPE-Solutions/permesh", rev = "ca84b7332f33d45e506374df019bda1eba0b8c8b" }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

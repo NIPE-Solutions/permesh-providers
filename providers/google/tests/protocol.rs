@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 #![allow(clippy::unwrap_used)]
-use permesh_provider_protocol::{Progress, SetupDecoder};
+use permesh_provider_protocol::{BrowserAuthDecoder, Progress, SetupDecoder};
 use std::process::Stdio;
 use tokio::io::AsyncWriteExt;
 
@@ -111,4 +111,73 @@ async fn real_binary_cancels_refresh_before_token_exchange_and_keeps_secrets_off
     let output = String::from_utf8(result.stdout).unwrap();
     assert!(output.contains("cancelled"));
     assert!(!output.contains("SENTINEL"));
+}
+
+#[tokio::test]
+async fn browser_auth_description_is_reference_only_and_read_only() {
+    let input = b"{\"protocol\":4,\"id\":\"handshake\",\"method\":\"handshake\",\"instance\":\"directory\"}\n{\"protocol\":4,\"id\":\"describe_auth\",\"method\":\"describe_auth\"}\n";
+    let result = process(input).await;
+    assert!(result.status.success());
+    assert!(result.stderr.is_empty());
+    let mut decoder = BrowserAuthDecoder::new(
+        "google",
+        "directory",
+        Some(&permesh_provider_google::provider_metadata().capabilities),
+    )
+    .unwrap();
+    for frame in result.stdout.split_inclusive(|b| *b == b'\n') {
+        decoder.push_frame(frame).unwrap();
+    }
+    decoder.finish().unwrap().validate().unwrap();
+    let frames: Vec<serde_json::Value> = result
+        .stdout
+        .split(|b| *b == b'\n')
+        .filter(|line| !line.is_empty())
+        .map(|line| serde_json::from_slice(line).unwrap())
+        .collect();
+    assert_eq!(frames.len(), 2);
+    assert_eq!(frames[0]["protocol"], 4);
+    assert_eq!(frames[1]["event"], "auth");
+    assert_eq!(frames[1]["id"], "describe_auth");
+    let spec = &frames[1]["spec"];
+    assert_eq!(spec["schema_version"], 1);
+    assert_eq!(
+        spec["authorization_endpoint"],
+        "https://accounts.google.com/o/oauth2/v2/auth"
+    );
+    assert_eq!(
+        spec["token_endpoint"],
+        "https://oauth2.googleapis.com/token"
+    );
+    assert_eq!(
+        spec["scopes"],
+        serde_json::json!(["https://www.googleapis.com/auth/admin.directory.user.readonly"])
+    );
+    assert_eq!(spec["client_id_field"], "client_id");
+    assert_eq!(spec["client_secret_slot"], "client_secret");
+    assert_eq!(spec["refresh_token_slot"], "refresh_token");
+    assert_eq!(
+        spec["when"],
+        serde_json::json!({"field":"auth_mode","equals":"refresh_token"})
+    );
+    assert_eq!(
+        spec["authorization_parameters"],
+        serde_json::json!({"access_type":"offline","prompt":"consent"})
+    );
+}
+
+#[tokio::test]
+async fn browser_description_rejects_credentials_and_does_not_enable_draft4_discovery() {
+    for tail in [
+        serde_json::json!({"protocol":4,"id":"describe_auth","method":"describe_auth","credentials":{"token":"NEVER-ECHO"}}),
+        serde_json::json!({"protocol":4,"id":"discover","method":"discover","configuration":{"customer_id":"C123"},"credentials":{"token":"NEVER-ECHO"}}),
+    ] {
+        let input = format!(
+            "{{\"protocol\":4,\"id\":\"handshake\",\"method\":\"handshake\",\"instance\":\"directory\"}}\n{tail}\n"
+        );
+        let result = process(input.as_bytes()).await;
+        assert!(!result.status.success());
+        assert!(!String::from_utf8_lossy(&result.stdout).contains("NEVER-ECHO"));
+        assert!(!String::from_utf8_lossy(&result.stderr).contains("NEVER-ECHO"));
+    }
 }
