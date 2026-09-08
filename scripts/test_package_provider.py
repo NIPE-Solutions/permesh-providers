@@ -105,6 +105,17 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(metadata['capabilities'], ['accounts', 'identities'])
         self.assertTrue(result.name.startswith('permesh-provider-google-'))
 
+    def test_cloudflare_package_does_not_advertise_identity_authority(self):
+        target = package.TARGETS[0]
+        github = self.binary(target)
+        github.with_name('permesh-provider-cloudflare').write_bytes(github.read_bytes())
+        self.metadata['packages'][0]['name'] = 'permesh-provider-cloudflare'
+        result = package.package(self.root, target, self.root / 'cloudflare-output', provider='cloudflare')
+        metadata = verify_package.verify(result, result.parent / 'catalog-entry.json')
+        self.assertEqual(metadata['provider'], 'cloudflare')
+        self.assertEqual(metadata['capabilities'], ['accounts', 'resources', 'groups', 'memberships', 'grants'])
+        self.assertNotIn('identities', metadata['capabilities'])
+
     def test_missing_notices_fail_before_creating_output(self):
         target = package.TARGETS[0]
         self.binary(target)

@@ -32,7 +32,7 @@ jobs:
       - name: Exercise offline native description
         shell: bash
         run: |
-          for provider in github google; do
+          for provider in github google cloudflare; do
             binary="target/debug/permesh-provider-$provider"
             if [ "$RUNNER_OS" = Windows ]; then binary="$binary.exe"; fi
             python scripts/smoke_provider.py --provider "$provider" "$binary"
