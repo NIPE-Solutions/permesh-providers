@@ -1,7 +1,7 @@
 # Configure the GitHub provider
 
-The package is being qualified. These instructions become usable once version
-`0.1.0` is listed in the catalog; do not substitute an unreviewed executable.
+Use the qualified `0.1.0` package from the official catalog. Review the release
+and its [coverage limitations](github.md) before granting execution trust.
 
 ## Install and trust
 
@@ -67,8 +67,8 @@ permesh user alice@example.com
 ```
 
 GitHub public email is not verified identity evidence. Configure an explicit
-identity alias mapping the account's GitHub login to the canonical identity, or
-look up the known provider account. Approval binds the full normalized workspace;
+identity alias mapping the account's immutable numeric GitHub ID (as a string)
+to the canonical identity, or look up the known GitHub login directly. Approval binds the full normalized workspace;
 configuration edits, including aliases, require another review and approval.
 
 Health tests authentication and active organization membership. Successful health
@@ -77,11 +77,19 @@ failures and the permanent visibility limitations described in the provider docs
 
 ## Existing workspaces and updates
 
-Keep a working built-in `type: github` instance until this external package passes
-qualification. Do not add a second copy to the same workspace merely to migrate:
-that would represent the same accounts under different provider instance IDs.
-The migration must preserve the existing instance ID, aliases, organizations and
-credential reference while introducing an explicitly reviewed executable pin.
+After installing and explicitly trusting the reviewed GitHub binary, convert an
+existing built-in instance while preserving its ID and credential reference:
+
+```bash
+permesh provider migrate github-main --sha256 REVIEWED_SHA256
+```
+
+Review the Git diff and run the review/approve steps above. Migration does not
+execute code, resolve credentials or grant approval. It changes the full workspace
+fingerprint, so every affected external instance needs renewed review/approval.
+Do not create a duplicate instance with another ID just to migrate; aliases and
+provider account identifiers rely on the existing instance ID. See the
+[CLI migration guide](https://github.com/NIPE-Solutions/permesh/blob/main/docs/github-migration.md).
 
 `permesh provider update github --check` is metadata-only. `provider update github`
 downloads a newer stable package, but existing workspaces keep their old trusted

@@ -45,8 +45,8 @@ A correction requires another version and qualification.
 
 After publication, download the actual GitHub release assets and verify them
 again. Add the five matching catalog entries through a separate reviewed pull
-request only when all assets exist and pass validation. The directory stays empty
-until the first release is qualified. Ordinary access queries do not contact it.
+request only when all assets exist and pass validation. The directory lists only qualified releases. Ordinary access queries do not
+contact it.
 
 ## Local checks
 

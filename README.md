@@ -10,22 +10,19 @@ from the services users configure. Permesh has no backend or telemetry.
 
 ## Status
 
-The [GitHub provider](docs/github.md) has a native subprocess implementation under
-`providers/github`, with the original API contract tests and draft 2/3 integration.
-The versioned [catalog](catalog/v1.json) remains empty until all five native
-release candidates pass qualification.
-Existing built-in providers continue to work during that transition.
-
-Permesh already supports explicitly trusted external binaries, workspace approval,
-credential delivery and declarative setup. Catalog installation and explicit updates are implemented on the CLI development
-main branch. No downloadable provider release is available yet:
+[GitHub provider 0.1.0](https://github.com/NIPE-Solutions/permesh-providers/releases/tag/github-v0.1.0)
+is available for macOS Apple Silicon and Intel, Linux GNU ARM64 and x86_64, and
+Windows x86_64. The [catalog](catalog/v1.json) lists the qualified packages.
 
 ```bash
-permesh provider install github --version VERSION
+permesh provider install github --version 0.1.0
 permesh provider update github --check
 permesh provider update github
-permesh provider update github --version VERSION
 ```
+
+Continue with [binary trust, setup and workspace approval](docs/github-setup.md).
+Existing built-in GitHub configurations have an explicit
+[migration path](https://github.com/NIPE-Solutions/permesh/blob/main/docs/github-migration.md).
 
 Updates are requested by the user. Ordinary access queries never check for
 updates. Downloading a package does not execute it, resolve credentials, or
@@ -50,6 +47,7 @@ repository or using Rust.
 - [GitHub installation and setup](docs/github-setup.md)
 - [Dependency policy](docs/dependencies.md)
 - [Release qualification](docs/releasing.md)
+- [GitHub 0.1.0 qualification record](docs/releases/github-0.1.0.md)
 - [Catalog schema and archive layout](docs/catalog.md)
 - [Distribution and explicit updates](docs/distribution.md)
 - [Provider migration and release acceptance](docs/provider-lifecycle.md)
