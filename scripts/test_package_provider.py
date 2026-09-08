@@ -93,6 +93,18 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(len(list(one.parent.iterdir())), 3)
                 self.assertEqual(verify_package.verify(one, one.parent / 'catalog-entry.json'), metadata)
 
+    def test_google_package_has_its_identity_capabilities_and_mit_notice(self):
+        target = package.TARGETS[0]
+        github = self.binary(target)
+        github.with_name('permesh-provider-google').write_bytes(github.read_bytes())
+        self.metadata['packages'][0]['name'] = 'permesh-provider-google'
+        self.metadata['packages'][0]['license'] = 'MIT'
+        result = package.package(self.root, target, self.root / 'google-output', provider='google')
+        metadata = verify_package.verify(result, result.parent / 'catalog-entry.json')
+        self.assertEqual(metadata['provider'], 'google')
+        self.assertEqual(metadata['capabilities'], ['accounts', 'identities'])
+        self.assertTrue(result.name.startswith('permesh-provider-google-'))
+
     def test_missing_notices_fail_before_creating_output(self):
         target = package.TARGETS[0]
         self.binary(target)

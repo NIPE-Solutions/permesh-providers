@@ -1176,10 +1176,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "permesh-native-runtime"
+version = "0.1.0"
+dependencies = [
+ "permesh-core",
+ "permesh-provider-sdk",
+ "serde",
+ "serde_json",
+ "tokio",
+ "zeroize",
+]
+
+[[package]]
 name = "permesh-provider-github"
 version = "0.1.0"
 dependencies = [
  "permesh-core",
+ "permesh-native-runtime",
  "permesh-provider-protocol",
  "permesh-provider-sdk",
  "permesh-secrets",
@@ -1189,6 +1202,26 @@ dependencies = [
  "tempfile",
  "time",
  "tokio",
+ "zeroize",
+]
+
+[[package]]
+name = "permesh-provider-google"
+version = "0.1.0"
+dependencies = [
+ "bytes",
+ "permesh-core",
+ "permesh-native-runtime",
+ "permesh-provider-protocol",
+ "permesh-provider-sdk",
+ "permesh-secrets",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "time",
+ "tokio",
+ "url",
  "zeroize",
 ]
 

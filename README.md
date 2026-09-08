@@ -29,6 +29,10 @@ updates. Downloading a package does not execute it, resolve credentials, or
 approve a workspace. Version selection and workspace adoption are separate
 operations; see the [distribution contract](docs/distribution.md).
 
+Google Workspace Directory is available as an unpublished native candidate with
+access-token and refresh-token authentication. See [Google setup, permissions and
+coverage](docs/google.md).
+
 ## Repository responsibilities
 
 - Provider source, synthetic fixtures, API contract tests and limitations.
@@ -43,6 +47,7 @@ repository or using Rust.
 
 ## Documentation
 
+- [Google Directory authentication and coverage](docs/google.md)
 - [GitHub permissions and coverage](docs/github.md)
 - [GitHub installation and setup](docs/github-setup.md)
 - [Dependency policy](docs/dependencies.md)
@@ -56,4 +61,6 @@ repository or using Rust.
 
 ## License
 
-MIT OR Apache-2.0, at your option. Both license texts are in [LICENSE](LICENSE).
+MIT OR Apache-2.0, at your option, except the Google adapter, which retains its
+[original MIT license](providers/google/LICENSE). Both repository license texts
+are in [LICENSE](LICENSE).

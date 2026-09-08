@@ -80,9 +80,9 @@ def notice_files(package, root):
     return sorted(found), directory, workspace
 
 
-def reachable(metadata):
+def reachable(metadata, provider='github'):
     packages = {package['id']: package for package in metadata['packages']}
-    roots = [p['id'] for p in metadata['packages'] if p['name'] == 'permesh-provider-github']
+    roots = [p['id'] for p in metadata['packages'] if p['name'] == f'permesh-provider-{provider}']
     if len(roots) != 1 or metadata.get('resolve') is None:
         raise ValueError('provider dependency graph is missing or ambiguous')
     nodes = {node['id']: node for node in metadata['resolve']['nodes']}
@@ -100,7 +100,7 @@ def reachable(metadata):
     return sorted((packages[key] for key in seen), key=lambda p: (p['name'], p['version'], p['id']))
 
 
-def bundle(root, metadata):
+def bundle(root, metadata, provider='github'):
     root = Path(root)
     project = regular_bytes(root / 'LICENSE', MAX_NOTICE_BYTES).decode('utf-8')
     sections = ['Permesh provider distribution licenses and notices', '', project.rstrip(), '',
@@ -108,7 +108,7 @@ def bundle(root, metadata):
                 'Each dependency below refers to the complete deduplicated text blocks that follow.', '']
     texts = {}
     identities = set()
-    for package in reachable(metadata):
+    for package in reachable(metadata, provider):
         identity = (package['name'], package['version'])
         if identity in identities:
             raise ValueError('different dependency sources share a name and version')

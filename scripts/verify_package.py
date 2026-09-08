@@ -7,7 +7,7 @@ import stat
 import struct
 import zipfile
 
-from package_provider import CAPABILITIES, MAX_ARCHIVE_BYTES, TARGETS, native_matches
+from package_provider import PROVIDERS, MAX_ARCHIVE_BYTES, TARGETS, native_matches
 from provider_notices import MAX_NOTICE_BYTES, regular_bytes
 
 
@@ -17,9 +17,9 @@ def verify(archive, entry):
     if set(release) != {'provider', 'version', 'target', 'capabilities', 'protocols', 'archive_sha256', 'executable_sha256', 'archive_size'}:
         raise ValueError('unexpected catalog entry fields')
     target = release['target']
-    if target not in TARGETS or release['provider'] != 'github' or release['protocols'] != [2, 3] or release['capabilities'] != CAPABILITIES:
+    if target not in TARGETS or release['provider'] not in PROVIDERS or release['protocols'] != [2, 3] or release['capabilities'] != PROVIDERS[release['provider']]:
         raise ValueError('unexpected catalog release identity')
-    if archive.name != f"permesh-provider-github-{release['version']}-{target}.zip":
+    if archive.name != f"permesh-provider-{release['provider']}-{release['version']}-{target}.zip":
         raise ValueError('archive name differs from release metadata')
     data = regular_bytes(archive, MAX_ARCHIVE_BYTES)
     digest = hashlib.sha256(data).hexdigest()

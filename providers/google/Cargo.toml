@@ -1,9 +1,9 @@
 [package]
-name = "permesh-provider-github"
+name = "permesh-provider-google"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
-license.workspace = true
+license = "MIT"
 repository.workspace = true
 publish = false
 
@@ -11,6 +11,7 @@ publish = false
 workspace = true
 
 [dependencies]
+bytes = "1"
 permesh-native-runtime = { path = "../../crates/native-runtime" }
 permesh-core.workspace = true
 permesh-provider-sdk.workspace = true
@@ -23,5 +24,6 @@ time.workspace = true
 zeroize.workspace = true
 
 [dev-dependencies]
+url = "2"
 tempfile.workspace = true
 permesh-provider-protocol.workspace = true

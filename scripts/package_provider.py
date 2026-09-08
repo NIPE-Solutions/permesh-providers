@@ -13,6 +13,7 @@ import provider_notices
 
 TARGETS = ('aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'aarch64-unknown-linux-gnu', 'x86_64-pc-windows-msvc')
 CAPABILITIES = ['accounts', 'resources', 'groups', 'memberships', 'grants']
+PROVIDERS = {'github': CAPABILITIES, 'google': ['accounts', 'identities']}
 MAX_ARCHIVE_BYTES = 128 * 1024 * 1024
 
 
@@ -43,7 +44,9 @@ def native_matches(data, target):
     return False
 
 
-def package(root, target, output):
+def package(root, target, output, provider='github'):
+    if provider not in PROVIDERS:
+        raise ValueError('unsupported provider')
     if target not in TARGETS:
         raise ValueError('unsupported target')
     root = Path(root).resolve(strict=True)
@@ -51,16 +54,16 @@ def package(root, target, output):
     version = manifest['workspace']['package']['version']
     if not isinstance(version, str) or re.fullmatch(r'(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)', version) is None:
         raise ValueError('provider release requires an exact stable semantic version')
-    executable = 'permesh-provider-github' + ('.exe' if 'windows' in target else '')
+    executable = f'permesh-provider-{provider}' + ('.exe' if 'windows' in target else '')
     binary = provider_notices.regular_bytes(root / 'target' / target / 'release' / executable, MAX_ARCHIVE_BYTES)
     if not native_matches(binary, target):
         raise ValueError('provider executable header does not match the target')
-    license_bytes = provider_notices.bundle(root, cargo_metadata(root, target))
+    license_bytes = provider_notices.bundle(root, cargo_metadata(root, target), provider)
     output = Path(output).absolute()
     if any(parent.is_symlink() or parent.is_junction() for parent in (output, *output.parents)):
         raise ValueError('package output must not contain links or junctions')
     output.mkdir()
-    archive = output / f'permesh-provider-github-{version}-{target}.zip'
+    archive = output / f'permesh-provider-{provider}-{version}-{target}.zip'
     archive_binary = 'provider.exe' if 'windows' in target else 'provider'
     with archive.open('xb') as raw:
         with zipfile.ZipFile(raw, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9, allowZip64=False) as stream:
@@ -75,7 +78,7 @@ def package(root, target, output):
     digest = hashlib.sha256(archive_bytes).hexdigest()
     with archive.with_name(archive.name + '.sha256').open('x', encoding='ascii', newline='\n') as stream:
         stream.write(f'{digest}  {archive.name}\n')
-    release = {'provider': 'github', 'version': version, 'target': target, 'capabilities': CAPABILITIES,
+    release = {'provider': provider, 'version': version, 'target': target, 'capabilities': PROVIDERS[provider],
                'protocols': [2, 3], 'archive_sha256': digest,
                'executable_sha256': hashlib.sha256(binary).hexdigest(), 'archive_size': len(archive_bytes)}
     with (output / 'catalog-entry.json').open('x', encoding='utf-8', newline='\n') as stream:
@@ -87,7 +90,8 @@ def package(root, target, output):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument('--provider', choices=PROVIDERS, default='github')
     parser.add_argument('--target', choices=TARGETS, required=True)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    print(package(args.root, args.target, args.output))
+    print(package(args.root, args.target, args.output, args.provider))
