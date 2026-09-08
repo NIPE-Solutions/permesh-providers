@@ -487,3 +487,83 @@ fn constructors_reject_unsafe_credential_and_scope_inputs() {
         );
     }
 }
+#[tokio::test]
+async fn total_pages_continues_short_pages_without_total_count() {
+    let (p,t)=mock(|target| {
+ if target.contains(&format!("accounts/{ACCOUNT}/members?")) {
+ let page=if target.ends_with("page=1"){1}else{2};
+ let mut row=member(json!([]));if page==2{row["id"]=json!(ROLE)}
+ return (200,String::new(),json!({"success":true,"result":[row],"result_info":{"page":page,"per_page":50,"count":1,"total_pages":2}}).to_string());
+ }routes(target,json!([]),json!([]),json!([]))}).await;
+    let s = p.discover().await.unwrap();
+    s.validate().unwrap();
+    assert!(s.complete);
+    assert_eq!(s.accounts.len(), 2);
+    t.abort();
+}
+#[tokio::test]
+async fn inconsistent_page_totals_never_claim_complete_results() {
+    for metadata in [
+        json!({"page":1,"per_page":50,"count":1,"total_pages":0}),
+        json!({"page":1,"per_page":50,"count":1,"total_pages":"2"}),
+        json!({"page":1,"per_page":50,"count":1,"total_pages":1,"total_count":2}),
+    ] {
+        let (p, t) = mock(move |target| {
+            if target.contains(&format!("accounts/{ACCOUNT}/members?")) {
+                (
+                    200,
+                    String::new(),
+                    json!({"success":true,"result":[member(json!([]))],"result_info":metadata})
+                        .to_string(),
+                )
+            } else {
+                routes(target, json!([]), json!([]), json!([]))
+            }
+        })
+        .await;
+        let s = p.discover().await.unwrap();
+        assert!(!s.complete);
+        t.abort();
+    }
+}
+#[tokio::test]
+async fn resource_group_and_permission_group_conditions_are_not_discarded() {
+    for path in ["resource_groups", "permission_groups"] {
+        let mut pol = policy("allow", "*");
+        pol[path][0]["condition"] = json!({"tag":"production"});
+        let (p, t) =
+            mock(move |target| routes(target, json!([member(json!([pol]))]), json!([]), json!([])))
+                .await;
+        let s = p.discover().await.unwrap();
+        assert!(!s.complete);
+        assert!(s.grants.is_empty());
+        t.abort();
+    }
+}
+#[tokio::test]
+async fn changed_total_pages_is_partial_and_omitted_metadata_keeps_prior_totals() {
+    for changed in [false, true] {
+        let (p, t) = mock(move |target| {
+            if target.contains(&format!("accounts/{ACCOUNT}/members?")) {
+                let page = if target.ends_with("page=1") { 1 } else { 2 };
+                let mut row = member(json!([]));
+                if page == 2 {
+                    row["id"] = json!(ROLE)
+                }
+                let mut response = json!({"success":true,"result":[row]});
+                if page == 1 {
+                    response["result_info"] = json!({"total_pages":2});
+                } else if changed {
+                    response["result_info"] = json!({"total_pages":3});
+                }
+                return (200, String::new(), response.to_string());
+            }
+            routes(target, json!([]), json!([]), json!([]))
+        })
+        .await;
+        let s = p.discover().await.unwrap();
+        assert_eq!(s.complete, !changed);
+        assert_eq!(s.accounts.len(), if changed { 1 } else { 2 });
+        t.abort();
+    }
+}

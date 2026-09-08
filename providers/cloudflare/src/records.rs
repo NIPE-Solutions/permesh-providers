@@ -338,6 +338,12 @@ impl CloudflareProvider {
                 .filter(|v| !v.is_empty())
                 .ok_or_else(|| error("unsupported_policy"))?;
             for resource in resources {
+                if resource.as_object().is_none_or(|v| {
+                    v.keys()
+                        .any(|k| !matches!(k.as_str(), "id" | "scope" | "meta" | "name"))
+                }) {
+                    return Err(error("unsupported_policy"));
+                }
                 let scope = resource
                     .get("scope")
                     .ok_or_else(|| error("unsupported_policy"))?;
@@ -385,6 +391,12 @@ impl CloudflareProvider {
                         return Err(error("unsupported_policy"));
                     };
                     for role in roles {
+                        if role.as_object().is_none_or(|v| {
+                            v.keys()
+                                .any(|k| !matches!(k.as_str(), "id" | "meta" | "name"))
+                        }) {
+                            return Err(error("unsupported_policy"));
+                        }
                         let role_id = id(role)?;
                         let name = string(role, "name")?;
                         if role_names

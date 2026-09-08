@@ -69,7 +69,8 @@ and its objects are either a known visible zone or the documented `*` object.
 An exact zone produces an assignment to `zone:ZONE_ID`. A wildcard produces a
 separate `policy-scope:account:ACCOUNT_ID:all` evidence resource; it is never
 expanded into assumed account-wide or per-zone effective grants. Unknown scope
-forms, new policy/scope constraints and conflicting role definitions are rejected.
+forms, new fields on policies/resource groups/permission groups/scopes and
+conflicting role definitions are rejected.
 
 The core graph has no deny-effect field. A deny or unsupported policy suppresses
 that subject's entire grant set. For affected members, membership paths are also
@@ -96,8 +97,10 @@ streamed bodies. Connection timeout is five seconds; request and body timeout is
 15 seconds; the library operation timeout is 120 seconds. The subprocess host may
 apply a tighter deadline. Dropping the future cancels requests and retry sleeps.
 
-Pagination follows local numeric pages, checks response counts, rejects repeated
-pages and changed totals, and probes another page if a full response omits totals.
+Pagination follows local numeric pages, honors both total_count and total_pages
+(including short intermediate pages), checks response counts, rejects repeated
+pages and contradictory or changed totals, and probes another page if a full
+response omits totals. Prior totals remain binding if a later response omits them.
 No server-provided next URL is requested. Successful HTTP responses also require
 `success: true`. Two retries at most handle 429/5xx responses. Numeric Retry-After
 is honored up to 30 seconds; larger/malformed delays or 429 without a delay return

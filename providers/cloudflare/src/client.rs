@@ -105,6 +105,7 @@ impl CloudflareProvider {
         let mut rows = Vec::new();
         let mut pages = BTreeSet::new();
         let mut known_total = None;
+        let mut known_pages = None;
         let result: Result<(), ProviderError> = async {
             for page in 1..=MAX_PAGES {
                 let mut query = filters.to_vec();
@@ -133,39 +134,65 @@ impl CloudflareProvider {
                 if budget.rows > MAX_ROWS {
                     return Err(error("limit"));
                 }
-                let more = match response.get("result_info") {
-                    None => values.len() == 50,
-                    Some(info) => {
-                        if !info.is_object() {
+                if let Some(info) = response.get("result_info") {
+                    if !info.is_object() {
+                        return Err(error("pagination"));
+                    }
+                    for (key, expected) in [
+                        ("page", page as u64),
+                        ("per_page", 50),
+                        ("count", values.len() as u64),
+                    ] {
+                        if info.get(key).is_some_and(|v| v.as_u64() != Some(expected)) {
                             return Err(error("pagination"));
                         }
-                        for (key, expected) in [
-                            ("page", page as u64),
-                            ("per_page", 50),
-                            ("count", values.len() as u64),
-                        ] {
-                            if info.get(key).is_some_and(|v| v.as_u64() != Some(expected)) {
+                    }
+                    for (key, previous) in [
+                        ("total_count", &mut known_total),
+                        ("total_pages", &mut known_pages),
+                    ] {
+                        if let Some(value) = info.get(key) {
+                            let value = value.as_u64().ok_or_else(|| error("pagination"))?;
+                            if previous.is_some_and(|old| old != value) {
                                 return Err(error("pagination"));
                             }
-                        }
-                        if let Some(total) = info.get("total_count") {
-                            let total = total.as_u64().ok_or_else(|| error("pagination"))?;
-                            if known_total.is_some_and(|previous| previous != total) {
-                                return Err(error("pagination"));
-                            }
-                            known_total = Some(total);
-                            let received = rows.len() + values.len();
-                            if total < received as u64
-                                || (values.is_empty() && total > received as u64)
-                            {
-                                return Err(error("pagination"));
-                            }
-                            total > received as u64
-                        } else {
-                            values.len() == 50
+                            *previous = Some(value);
                         }
                     }
+                }
+                let received = rows.len() + values.len();
+                let by_count = if let Some(total) = known_total {
+                    if total < received as u64 {
+                        return Err(error("pagination"));
+                    }
+                    Some(total > received as u64)
+                } else {
+                    None
                 };
+                let by_pages = if let Some(total) = known_pages {
+                    // Empty collections may report zero pages; this is only valid
+                    // before any source rows and on the initial request.
+                    if total == 0 {
+                        if page != 1 || received != 0 {
+                            return Err(error("pagination"));
+                        }
+                        Some(false)
+                    } else {
+                        if total < page as u64 {
+                            return Err(error("pagination"));
+                        }
+                        Some(total > page as u64)
+                    }
+                } else {
+                    None
+                };
+                if matches!((by_count,by_pages),(Some(a),Some(b)) if a!=b) {
+                    return Err(error("pagination"));
+                }
+                let more = by_count.or(by_pages).unwrap_or(values.len() == 50);
+                if more && values.is_empty() {
+                    return Err(error("pagination"));
+                }
                 rows.extend(values.iter().cloned());
                 if !more {
                     return Ok(());
