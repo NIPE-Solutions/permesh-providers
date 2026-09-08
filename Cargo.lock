@@ -1551,6 +1551,7 @@ name = "permesh-native-runtime"
 version = "0.1.0"
 dependencies = [
  "permesh-core",
+ "permesh-provider-protocol",
  "permesh-provider-sdk",
  "serde",
  "serde_json",
