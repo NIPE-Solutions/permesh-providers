@@ -32,7 +32,22 @@ Native role names are retained. Repository read/pull/triage normalize to standar
 
 All snapshots include permanent visibility limitations. `complete=true` means planned bounded collection finished; it does not prove all access was visible. Token permissions, selected repositories, SSO, and secret teams can restrict results. Pending invitations, enterprise policy, organization base-permission settings, non-repository resources, team maintainer roles, and explicit nested-team hierarchy are not enumerated. Collection is not transactional.
 
-Failed endpoints, malformed records, invalid pagination, and exhausted budgets preserve useful observations with `complete=false` and sanitized category warnings. If no organization can be observed, discovery returns an error. Final snapshots pass the shared SDK validator.
+Failed endpoints, malformed or conflicting records, invalid pagination, and exhausted budgets preserve useful observations with `complete=false` and sanitized category warnings. If no organization can be observed, discovery returns an error. Final snapshots pass the shared SDK validator.
+
+Identical repeats of the fields used for normalization are deduplicated. An omitted
+account type preserves a previously observed type; a later explicit type refines
+an unknown account kind. If the
+same native account changes login or reports incompatible explicit types, a repository changes full name, or a
+team changes organization/slug/name during collection, that entity and its
+dependent memberships/grants are excluded for the rest of the collection.
+Conflicting roles for the same subject, resource and API evidence method exclude
+that grant claim; observations from distinct methods remain distinct. A later
+repeat of the original value does not restore an excluded claim. This can omit
+legitimate access during concurrent upstream edits, so conflicts always mark the
+snapshot incomplete. Stable native keys do not change, and a clean subsequent
+collection can observe the entity again. Native draft 2 reports the conflict
+through its existing generic limitation category rather than exposing raw rows.
+
 
 Limits per discovery:
 

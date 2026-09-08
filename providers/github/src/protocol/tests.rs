@@ -249,3 +249,109 @@ fn sdk_error_mapping_is_complete_and_fixed() {
         assert_eq!(response::error_code(code), expected);
     }
 }
+
+#[tokio::test]
+async fn conflicting_paginated_observations_never_escape_the_native_contract() {
+    for conflict in [
+        "identical",
+        "account_login",
+        "account_type",
+        "repository",
+        "team",
+        "role",
+    ] {
+        let (origin, task) = mock(move |path| {
+            let body = if path == "/orgs/acme" {
+                json!({"id":9,"login":"acme"})
+            } else if path.starts_with("/orgs/acme/repos?") {
+                if path.ends_with("page=1") {
+                    Value::Array((0..100).map(|_| json!({"id":7,"full_name":"acme/app"})).collect())
+                } else {
+                    json!([{"id":7,"full_name":if conflict == "repository" {"acme/renamed"} else {"acme/app"}}])
+                }
+            } else if path.starts_with("/orgs/acme/teams?") {
+                if path.ends_with("page=1") {
+                    Value::Array((0..100).map(|_| json!({"id":3,"slug":"eng","name":"Engineering"})).collect())
+                } else {
+                    json!([{"id":3,"slug":if conflict == "team" {"renamed"} else {"eng"},"name":"Engineering"}])
+                }
+            } else if path.contains("/teams/eng/members?") {
+                json!([{"id":1,"login":"alice","type":"User"}])
+            } else if path.contains("/teams/eng/repos?") {
+                json!([{"id":7,"full_name":"acme/app"}])
+            } else if path == "/orgs/acme/teams/eng/repos/acme/app" {
+                json!({"id":7,"full_name":"acme/app","role_name":"write"})
+            } else if path.contains("/collaborators?") {
+                if path.ends_with("page=1") {
+                    Value::Array((0..100).map(|_| json!({"id":1,"login":"alice","type":"User","role_name":"write"})).collect())
+                } else {
+                    json!([
+                        {"id":1,"login":if conflict == "account_login" {"renamed"} else {"alice"},"type":if conflict == "account_type" {"Bot"} else {"User"},"role_name":if conflict == "role" {"admin"} else {"write"}},
+                        {"id":1,"login":"alice","type":"User","role_name":"write"}
+                    ])
+                }
+            } else { json!([]) };
+            (200, body.to_string())
+        }).await;
+        let (result, output) = exchange(&origin, false).await;
+        assert!(result.is_ok(), "{conflict}");
+        let mut decoder = DiscoveryDecoder::new_versioned(
+            "github",
+            "github-main",
+            Some(&crate::provider_metadata().capabilities),
+            2,
+        )
+        .unwrap();
+        for frame in output.split_inclusive(|b| *b == b'\n') {
+            decoder.push_frame(frame).unwrap();
+        }
+        let snapshot = decoder.finish().unwrap();
+        assert_eq!(snapshot.complete, conflict == "identical", "{conflict}");
+        match conflict {
+            "identical" => {
+                assert_eq!(snapshot.accounts.len(), 1);
+                assert_eq!(snapshot.grants.len(), 2);
+                assert_eq!(snapshot.memberships.len(), 1);
+            }
+            "account_login" | "account_type" => {
+                assert!(snapshot.accounts.is_empty());
+                assert!(snapshot.memberships.is_empty());
+                assert!(
+                    snapshot
+                        .grants
+                        .iter()
+                        .all(|g| !matches!(g.subject, permesh_core::Subject::Account(_)))
+                );
+            }
+            "repository" => {
+                assert!(
+                    snapshot
+                        .resources
+                        .iter()
+                        .all(|r| r.key.id != "repository:7")
+                );
+                assert!(snapshot.grants.is_empty());
+            }
+            "team" => {
+                assert!(snapshot.groups.iter().all(|g| g.key.id != "team:3"));
+                assert!(snapshot.memberships.is_empty());
+                assert!(
+                    snapshot
+                        .grants
+                        .iter()
+                        .all(|g| !matches!(g.subject, permesh_core::Subject::Group(_)))
+                );
+            }
+            "role" => {
+                assert!(
+                    snapshot
+                        .grants
+                        .iter()
+                        .all(|g| g.provenance.method != "github.repository_collaborator_effective")
+                );
+            }
+            _ => unreachable!(),
+        }
+        task.abort();
+    }
+}
