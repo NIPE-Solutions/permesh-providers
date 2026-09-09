@@ -1,7 +1,7 @@
 # Microsoft Entra provider candidate
 
 `permesh-provider-entra` 0.2.0 is a read-only public-cloud Microsoft Graph candidate.
-It is not in the public catalog and has not been live-tenant qualified. It collects
+It is a published evaluation prerelease and has not been live-tenant qualified. It collects
 one explicitly configured tenant's directory identities/accounts, groups and direct
 user/group memberships. It does not evaluate authorization or infer employment.
 
@@ -142,9 +142,13 @@ fixture proves explicit proxy routing while hostile ambient proxy settings are i
 its Graph destination is never contacted. Shared-runtime tests separately qualify CA
 parsing, positive private-CA TLS and hostname validation.
 
-Native validation in this slice is local only. Five-target artifact publication,
-installation/catalog metadata, live permission consent and tenant/API behavior remain
-unqualified until recorded separately. No compatible published release is claimed.
+Five-target artifact and exact packaged-host evidence is recorded in the
+[qualification matrix](qualification.md); live permission consent and tenant/API
+behavior remain unqualified. With CLI alpha.3, download using
+`permesh provider install entra --version 0.2.0`, inspect and explicitly trust
+the installed native executable, then use `permesh provider setup entra
+--id entra-main --discovery-protocol negotiated-v1` and review/approve the instance.
+Guided `provider add entra` is not supported by alpha.3.
 
 Before an explicitly authorized live session:
 

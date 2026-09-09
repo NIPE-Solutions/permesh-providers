@@ -1,9 +1,10 @@
-# Negotiated v1 source candidates
+# Negotiated v1 adoption
 
-The unpublished 0.2.0 providers use the negotiated v1 discovery contract in
-Permesh revision `0196197a215c0b244251fe1e3ca1eb759159776b`. The current release
-catalog still describes older published binaries. Updating source does not
-change those binaries, install new code, or approve a workspace.
+The 0.2.0 evaluation prereleases use the negotiated v1 discovery contract in
+Permesh revision `0196197a215c0b244251fe1e3ca1eb759159776b`. The release catalog retains older legacy entries alongside negotiated-v1 entries.
+Updating the catalog does not install new code or approve a workspace.
+
+Upgrade to Permesh CLI **0.1.0-alpha.3** before using this catalog. Alpha.2 rejects the new negotiated-v1 metadata even when selecting legacy 0.1.0. Existing installed packages, trust and workspace pins are not changed by a catalog update.
 
 ## Compatibility and adoption
 
@@ -40,8 +41,8 @@ for guided official setup. Standalone setup and explicit external configuration
 retain the legacy default unless a selector is supplied. Older hosts that do not
 recognize this metadata are incompatible with these candidates.
 Release qualification must exercise install, trust, setup, approval and both
-operations on the matching host. No release or catalog update is part of this
-source migration.
+operations on the matching host. The [release record](releases/providers-0.2.0-candidate.md) tracks the subsequent
+publication and separately reviewed catalog update.
 
 Candidate `catalog-entry.json` now includes `discovery_protocol: negotiated_v1`
 and lists only legacy setup in `protocols: [3]`. The pinned Permesh revision

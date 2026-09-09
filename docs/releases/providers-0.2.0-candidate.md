@@ -1,6 +1,19 @@
-# Providers 0.2.0 candidate
+# Providers 0.2.0 evaluation prereleases
 
-Status: exact packaged host acceptance passed; unpublished candidate.
+Status: original qualified packages published as evaluation prereleases on
+2026-09-09. Each of the seven releases contains five ZIPs and five checksum
+sidecars. All 70 assets were verified after staging and again through
+unauthenticated public downloads; all 35 downloaded ZIPs passed the existing
+package verifier against original catalog metadata. Tags resolve to the exact
+provider source below. Previous releases and drafts remain unchanged.
+
+Upgrade to Permesh CLI **0.1.0-alpha.3** before using this catalog. Alpha.2 rejects the new negotiated-v1 metadata even when selecting legacy 0.1.0. Existing installed packages, trust and workspace pins are not changed by a catalog update.
+
+Public catalog installation acceptance is tracked separately below.
+
+## Published assets
+
+[github 0.2.0](https://github.com/NIPE-Solutions/permesh-providers/releases/tag/github-v0.2.0), [google 0.2.0](https://github.com/NIPE-Solutions/permesh-providers/releases/tag/google-v0.2.0), [cloudflare 0.2.0](https://github.com/NIPE-Solutions/permesh-providers/releases/tag/cloudflare-v0.2.0), [aws 0.2.0](https://github.com/NIPE-Solutions/permesh-providers/releases/tag/aws-v0.2.0), [gitlab 0.2.0](https://github.com/NIPE-Solutions/permesh-providers/releases/tag/gitlab-v0.2.0), [entra 0.2.0](https://github.com/NIPE-Solutions/permesh-providers/releases/tag/entra-v0.2.0), [aws-identity-center 0.2.0](https://github.com/NIPE-Solutions/permesh-providers/releases/tag/aws-identity-center-v0.2.0).
 
 ## Exact revisions
 
@@ -64,11 +77,8 @@ was performed.
 
 ## Remaining gates and limits
 
-These are temporary, unsigned workflow artifacts. No release or catalog entry was
-published. The evidence does not establish publisher authentication, signatures,
+These are unsigned evaluation releases promoted from the original workflow artifacts. The evidence does not establish publisher authentication, signatures,
 notarization, reproducible builds, complete license compliance, live API coverage,
-other operating systems or protocol stability. Public 0.2.0 catalog-guided
-installation and update remain open because no 0.2.0 entry or release exists; only
-the published GitHub 0.1.0 catalog install/update path passed. Publication still
-requires an explicit maintainer release operation, verification of the actual
-release assets, and a separately reviewed catalog change.
+other operating systems or protocol stability. Public 0.2.0 catalog-guided installation and update are a separate acceptance
+gate following the reviewed catalog change. The earlier GitHub 0.1.0 catalog
+install/update result remains historical evidence.

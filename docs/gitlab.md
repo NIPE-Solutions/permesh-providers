@@ -1,7 +1,6 @@
 # GitLab membership candidate
 
-GitLab `0.2.0` is an unpublished source candidate. It has no catalog entry and
-has not been qualified against a live GitLab.com tenant, self-managed version or
+GitLab `0.2.0` is a published evaluation prerelease. It has not been qualified against a live GitLab.com tenant, self-managed version or
 edition. Synthetic tests establish behavior against fixtures, not broad API or
 platform compatibility. The candidate uses the existing native runtime and
 negotiated v1 health/discovery, plus legacy draft 3 setup.
@@ -111,8 +110,9 @@ cargo +1.94.1 build -p permesh-provider-gitlab --release --locked
 ```
 
 Normal production native inspect/trust, setup and workspace approval remain
-required. This candidate is not available through catalog installation. Use a
-compatible reviewed host and `provider setup gitlab --id gitlab-main
+required. Download with `permesh provider install gitlab --version 0.2.0`
+using CLI alpha.3, then register and trust the installed native executable. Use
+`provider setup gitlab --id gitlab-main
 --discovery-protocol negotiated-v1` only after explicitly registering the native
 binary with its exact digest and accounts/resources/groups/memberships/grants
 capabilities. Never approve a script or bypass trust to test a candidate.

@@ -19,25 +19,24 @@ credentials you explicitly configure, and have no Permesh backend or telemetry.
 
 | Provider | What it discovers | Published package | Current source |
 | --- | --- | --- | --- |
-| [GitHub](docs/github.md) | Organization members/owners, repositories, teams, memberships and observed permissions | **0.1.0 — installable** | 0.2.0 candidate |
-| [Google Workspace](docs/google.md) | Directory accounts and lifecycle; optional authoritative identities | Not published | 0.2.0 candidate |
-| [Cloudflare](docs/cloudflare.md) | Account members, IAM groups, roles and scoped policy assignments | Not published | 0.2.0 candidate |
-| [AWS IAM](docs/aws.md) | Users, roles, groups and managed/inline policy attachments | Not published | 0.2.0 candidate |
-| [GitLab](docs/gitlab.md) | Explicit groups/projects, direct members and separately labeled collapsed effective membership | Not published | 0.2.0 candidate |
-| [Microsoft Entra](docs/entra.md) | Proved-tenant directory accounts/identities, groups and direct user/group memberships | Not published | 0.2.0 candidate |
-| [AWS Identity Center](docs/aws-identity-center.md) | Selected store accounts/groups, direct memberships and provisioned permission-set assignments for allowlisted accounts | Not published | 0.2.0 candidate |
+| [GitHub](docs/github.md) | Organization members/owners, repositories, teams, memberships and observed permissions | **0.2.0 — evaluation prerelease** | 0.2.0 |
+| [Google Workspace](docs/google.md) | Directory accounts and lifecycle; optional authoritative identities | **0.2.0 — evaluation prerelease** | 0.2.0 |
+| [Cloudflare](docs/cloudflare.md) | Account members, IAM groups, roles and scoped policy assignments | **0.2.0 — evaluation prerelease** | 0.2.0 |
+| [AWS IAM](docs/aws.md) | Users, roles, groups and managed/inline policy attachments | **0.2.0 — evaluation prerelease** | 0.2.0 |
+| [GitLab](docs/gitlab.md) | Explicit groups/projects, direct members and separately labeled collapsed effective membership | **0.2.0 — evaluation prerelease** | 0.2.0 |
+| [Microsoft Entra](docs/entra.md) | Proved-tenant directory accounts/identities, groups and direct user/group memberships | **0.2.0 — evaluation prerelease** | 0.2.0 |
+| [AWS Identity Center](docs/aws-identity-center.md) | Selected store accounts/groups, direct memberships and provisioned permission-set assignments for allowlisted accounts | **0.2.0 — evaluation prerelease** | 0.2.0 |
 
 **Installable** means qualified artifacts are listed in the [public catalog](catalog/v1.json).
-**Candidate** means implemented source with offline tests; it is not an installable
-release or a claim of complete live qualification. No provider is declared stable.
+Publication does not establish complete live qualification. No provider is declared stable.
 
-GitHub 0.1.0 is available for macOS Apple Silicon and Intel, Linux GNU ARM64 and
-x86_64, and Windows x86_64. A recorded five-target candidate run covers all seven providers at one exact source
-tree, with 35 trial packages independently verified. These unsigned candidates
-remain unpublished, and live qualification is separate. See the
-[exact qualification matrix](docs/qualification.md). Candidates require a compatible current-source CLI; see
-[candidate compatibility](docs/negotiated-v1.md). Source versions do not change
-already published binaries.
+All seven 0.2.0 providers are available for macOS Apple Silicon and Intel, Linux
+GNU ARM64 and x86_64, and Windows x86_64. Their 35 original packages were verified
+after staging and again through unauthenticated public downloads. Legacy GitHub
+0.1.0 remains available. See the [qualification matrix](docs/qualification.md)
+and [release record](docs/releases/providers-0.2.0-candidate.md).
+
+Upgrade to Permesh CLI **0.1.0-alpha.3** before using this catalog. Alpha.2 rejects the new negotiated-v1 metadata even when selecting legacy 0.1.0. Existing installed packages, trust and workspace pins are not changed by a catalog update.
 
 Coverage matters more than the number of integrations. Google currently supplies
 directory identities, not group or resource grants. AWS IAM inventories attachments;
@@ -73,9 +72,12 @@ Start with a login; an email lookup needs verified identity evidence or an expli
 mapping to the immutable account ID. Read the [GitHub setup guide](docs/github-setup.md)
 for permissions, multiple instances, scripting and updates.
 
-**The unpublished providers cannot currently be installed from the catalog.**
-Do not replace `github` with a candidate name and expect a public download.
-Contributors can build and explicitly register candidates using the
+The seven provider IDs are `github`, `google`, `cloudflare`, `aws`, `gitlab`,
+`entra` and `aws-identity-center`. Use the corresponding guide to choose scopes
+and credential references. Guided `provider add` supports GitHub, Google,
+Cloudflare and AWS IAM. GitLab, Entra and Identity Center use `provider install`
+followed by explicit native registration, trust, setup and workspace approval.
+Local builds remain available through the
 [development guide](docs/development.md).
 
 ## Install and update deliberately
@@ -83,7 +85,7 @@ Contributors can build and explicitly register candidates using the
 Use these commands to download a package separately from workspace setup:
 
 ```bash
-permesh provider install github --version 0.1.0
+permesh provider install github --version 0.2.0
 permesh provider update github --check
 permesh provider update github
 ```
