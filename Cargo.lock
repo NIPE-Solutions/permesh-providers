@@ -1539,7 +1539,7 @@ checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 [[package]]
 name = "permesh-core"
 version = "0.1.0-alpha.2"
-source = "git+https://github.com/NIPE-Solutions/permesh?rev=2c1581771b321b482655863cffa25ad5c3d12d26#2c1581771b321b482655863cffa25ad5c3d12d26"
+source = "git+https://github.com/NIPE-Solutions/permesh?rev=0196197a215c0b244251fe1e3ca1eb759159776b#0196197a215c0b244251fe1e3ca1eb759159776b"
 dependencies = [
  "serde",
  "thiserror",
@@ -1553,9 +1553,12 @@ dependencies = [
  "permesh-core",
  "permesh-provider-protocol",
  "permesh-provider-sdk",
+ "reqwest",
+ "rustls",
  "serde",
  "serde_json",
  "tokio",
+ "tokio-rustls",
  "zeroize",
 ]
 
@@ -1640,7 +1643,7 @@ dependencies = [
 [[package]]
 name = "permesh-provider-protocol"
 version = "0.1.0-alpha.2"
-source = "git+https://github.com/NIPE-Solutions/permesh?rev=2c1581771b321b482655863cffa25ad5c3d12d26#2c1581771b321b482655863cffa25ad5c3d12d26"
+source = "git+https://github.com/NIPE-Solutions/permesh?rev=0196197a215c0b244251fe1e3ca1eb759159776b#0196197a215c0b244251fe1e3ca1eb759159776b"
 dependencies = [
  "permesh-core",
  "permesh-provider-sdk",
@@ -1652,7 +1655,7 @@ dependencies = [
 [[package]]
 name = "permesh-provider-sdk"
 version = "0.1.0-alpha.2"
-source = "git+https://github.com/NIPE-Solutions/permesh?rev=2c1581771b321b482655863cffa25ad5c3d12d26#2c1581771b321b482655863cffa25ad5c3d12d26"
+source = "git+https://github.com/NIPE-Solutions/permesh?rev=0196197a215c0b244251fe1e3ca1eb759159776b#0196197a215c0b244251fe1e3ca1eb759159776b"
 dependencies = [
  "permesh-core",
  "serde",
@@ -1664,7 +1667,7 @@ dependencies = [
 [[package]]
 name = "permesh-secrets"
 version = "0.1.0-alpha.2"
-source = "git+https://github.com/NIPE-Solutions/permesh?rev=2c1581771b321b482655863cffa25ad5c3d12d26#2c1581771b321b482655863cffa25ad5c3d12d26"
+source = "git+https://github.com/NIPE-Solutions/permesh?rev=0196197a215c0b244251fe1e3ca1eb759159776b#0196197a215c0b244251fe1e3ca1eb759159776b"
 dependencies = [
  "keyring",
  "secrecy",

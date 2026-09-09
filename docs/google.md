@@ -196,3 +196,10 @@ Google's consent screen and account policy still determine whether authorization
 is allowed. App verification, test-user restrictions and administrator consent
 remain Google-side prerequisites. Local synthetic OAuth tests are not a completed
 live Google authorization or tenant-visibility qualification.
+
+## Enterprise network settings
+
+Current source candidates support host-approved HTTPS proxy and additional CA
+settings through the negotiated `network_v1` feature. See [network configuration,
+limits and qualification](network.md). Ambient proxy variables are not inherited.
+The same context applies to OAuth refresh-token exchanges and Directory API requests.

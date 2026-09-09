@@ -193,3 +193,22 @@ async fn real_binary_rejects_draft2_discovery_handshake() {
     assert!(output.contains("protocol_error"));
     assert!(!output.contains("capabilities"));
 }
+
+#[path = "../../../crates/native-runtime/tests/support/process_network.rs"]
+mod process_network;
+#[tokio::test]
+async fn negotiated_network_routes_provider_api_through_explicit_proxy() {
+    process_network::check_proxy(
+        env!("CARGO_BIN_EXE_permesh-provider-google"),
+        "directory",
+        serde_json::json!({"customer_id":"C12345","auth_mode":"access_token"}),
+        serde_json::json!({"token":"SENTINEL"}),
+        "admin.googleapis.com",
+    )
+    .await;
+}
+
+#[tokio::test]
+async fn negotiated_network_also_routes_oauth_refresh_before_directory_access() {
+    process_network::check_proxy(env!("CARGO_BIN_EXE_permesh-provider-google"), "directory", serde_json::json!({"customer_id":"C12345","auth_mode":"refresh_token","client_id":"synthetic.apps.googleusercontent.com"}), serde_json::json!({"refresh_token":"SENTINEL-refresh","client_secret":"SENTINEL-client"}), "oauth2.googleapis.com").await;
+}

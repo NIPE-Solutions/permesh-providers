@@ -30,6 +30,14 @@ pub struct CloudflareProvider {
 }
 impl CloudflareProvider {
     pub fn new(id: String, account_id: String, token: Secret) -> Result<Self, ProviderError> {
+        Self::new_with_network(id, account_id, token, None)
+    }
+    pub fn new_with_network(
+        id: String,
+        account_id: String,
+        token: Secret,
+        network: Option<&permesh_provider_sdk::network::NetworkContext>,
+    ) -> Result<Self, ProviderError> {
         if !valid_instance(&id)
             || !records::native_id(&account_id)
             || token.expose().is_empty()
@@ -38,7 +46,7 @@ impl CloudflareProvider {
         {
             return Err(error("configuration"));
         }
-        let client = Client::builder()
+        let client = permesh_native_runtime::network::client_builder(network)?
             .redirect(reqwest::redirect::Policy::none())
             .connect_timeout(Duration::from_secs(5))
             .timeout(Duration::from_secs(15))

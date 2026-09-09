@@ -93,3 +93,17 @@ async fn binary_rejects_draft_discovery_and_unselected_operations_before_credent
         assert!(String::from_utf8_lossy(&result.stdout).contains("protocol_error"));
     }
 }
+
+#[path = "../../../crates/native-runtime/tests/support/process_network.rs"]
+mod process_network;
+#[tokio::test]
+async fn negotiated_network_routes_provider_api_through_explicit_proxy() {
+    process_network::check_proxy(
+        env!("CARGO_BIN_EXE_permesh-provider-cloudflare"),
+        "cf",
+        serde_json::json!({"account_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}),
+        serde_json::json!({"token":"SENTINEL"}),
+        "api.cloudflare.com",
+    )
+    .await;
+}

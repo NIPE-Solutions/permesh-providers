@@ -2,7 +2,7 @@
 //! Fixed-endpoint refresh-token exchange. No token cache or persistence.
 use permesh_provider_sdk::ProviderError;
 use permesh_secrets::Secret;
-use reqwest::{Client, Url};
+use reqwest::Url;
 use serde::Deserialize;
 use std::time::Duration;
 use zeroize::Zeroizing;
@@ -14,9 +14,10 @@ pub(super) async fn refresh(
     client_id: &str,
     refresh_token: &Secret,
     client_secret: &Secret,
+    network: Option<&permesh_provider_sdk::network::NetworkContext>,
 ) -> Result<Secret, ProviderError> {
     let endpoint = Url::parse(TOKEN_ENDPOINT).map_err(|_| crate::error("configuration"))?;
-    exchange(client_id, refresh_token, client_secret, endpoint).await
+    exchange_with_network(client_id, refresh_token, client_secret, endpoint, network).await
 }
 fn auth_error() -> ProviderError {
     ProviderError::new(
@@ -62,11 +63,21 @@ struct TokenResponse {
     token_type: String,
     expires_in: u64,
 }
+#[cfg(test)]
 async fn exchange(
     client_id: &str,
     refresh_token: &Secret,
     client_secret: &Secret,
     endpoint: Url,
+) -> Result<Secret, ProviderError> {
+    exchange_with_network(client_id, refresh_token, client_secret, endpoint, None).await
+}
+async fn exchange_with_network(
+    client_id: &str,
+    refresh_token: &Secret,
+    client_secret: &Secret,
+    endpoint: Url,
+    network: Option<&permesh_provider_sdk::network::NetworkContext>,
 ) -> Result<Secret, ProviderError> {
     if client_id.is_empty()
         || client_id.len() > 1024
@@ -75,7 +86,7 @@ async fn exchange(
     {
         return Err(auth_error());
     }
-    let client = Client::builder()
+    let client = permesh_native_runtime::network::client_builder(network)?
         .redirect(reqwest::redirect::Policy::none())
         .connect_timeout(Duration::from_secs(5))
         .timeout(Duration::from_secs(15))

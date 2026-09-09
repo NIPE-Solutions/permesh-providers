@@ -25,6 +25,9 @@ pub(crate) struct Cloudflare;
 impl Adapter for Cloudflare {
     type Configuration = Configuration;
     type Credentials = Credentials;
+    fn supports_network() -> bool {
+        true
+    }
     fn metadata() -> Metadata {
         crate::provider_metadata()
     }
@@ -97,14 +100,15 @@ pub async fn run<R: AsyncRead + Unpin, W: AsyncWrite + Unpin>(
     reader: R,
     writer: W,
 ) -> Result<(), ProtocolFailure> {
-    permesh_native_runtime::serve::<Cloudflare, _, _, _, _, _>(
+    permesh_native_runtime::serve_with_network::<Cloudflare, _, _, _, _, _>(
         reader,
         writer,
-        |id, configuration, mut credentials| async move {
-            CloudflareProvider::new(
+        |id, configuration, mut credentials, network| async move {
+            CloudflareProvider::new_with_network(
                 id,
                 configuration.account_id,
                 Secret::new(std::mem::take(&mut *credentials.token)),
+                network.as_ref(),
             )
         },
     )

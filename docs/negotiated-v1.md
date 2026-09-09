@@ -1,7 +1,7 @@
 # Negotiated v1 source candidates
 
 The unpublished 0.2.0 providers use the negotiated v1 discovery contract in
-Permesh revision `2c1581771b321b482655863cffa25ad5c3d12d26`. The current release
+Permesh revision `0196197a215c0b244251fe1e3ca1eb759159776b`. The current release
 catalog still describes older published binaries. Updating source does not
 change those binaries, install new code, or approve a workspace.
 

@@ -36,6 +36,14 @@ impl GithubProvider {
         organizations: Vec<String>,
         token: Secret,
     ) -> Result<Self, ProviderError> {
+        Self::new_with_network(id, organizations, token, None)
+    }
+    pub fn new_with_network(
+        id: String,
+        organizations: Vec<String>,
+        token: Secret,
+        network: Option<&permesh_provider_sdk::network::NetworkContext>,
+    ) -> Result<Self, ProviderError> {
         if id.trim().is_empty()
             || id.len() > 128
             || organizations.is_empty()
@@ -47,7 +55,7 @@ impl GithubProvider {
         {
             return Err(error("configuration"));
         }
-        let client = Client::builder()
+        let client = permesh_native_runtime::network::client_builder(network)?
             .redirect(reqwest::redirect::Policy::none())
             .connect_timeout(Duration::from_secs(5))
             .timeout(Duration::from_secs(15))
