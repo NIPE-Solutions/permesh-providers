@@ -63,13 +63,16 @@ passed all five targets, and independent verification of its bundle and public A
 covered all 20 subjects. The exact CLI binary used for local acceptance had SHA-256
 `33d366c9b7481bed551b9de41a81af95324984f36d145a03288cf9b2147630a8`.
 
-That exact CLI installed all 35 source-matched provider packages through the
-package store and validated the five-target maps and native executable digests.
-On macOS ARM64, all seven providers passed draft 3 setup description and negotiated
-handshakes; actual declarative setup, explicit executable trust and workspace review
-and approval were exercised. Negative checks confirmed no automatic approval and
-rejected a wrong approval fingerprint, absent credentials, changed native pins,
-missing target pins and tampered target pins. This qualifies the tested local
+A separately compiled harness using the matching alpha.3 source `PackageStore`
+validated and installed all 35 provider archives. This checked foreign-target
+package formats on macOS without executing foreign-target binaries. On macOS
+ARM64, all seven native providers passed draft 3 descriptions and negotiated
+handshakes. The exact packaged CLI then exercised actual declarative setup,
+explicit trust, workspace review and approval, and exact five-target digest maps
+and native digest resolution. The maps were explicitly applied to the generated
+local configuration, not selected through the public catalog. Negative checks confirmed no automatic approval and
+rejected a wrong approval fingerprint, absent credentials, and missing or changed
+native pins. This qualifies the tested local
 package/host paths for the exact pair. It does not turn provider package verification
 into host qualification for other versions or environments.
 

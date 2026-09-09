@@ -38,17 +38,19 @@ reported by GitHub:
 
 ## Exact packaged host acceptance
 
-The exact CLI candidate binary, SHA-256
-`33d366c9b7481bed551b9de41a81af95324984f36d145a03288cf9b2147630a8`,
-installed all 35 source-matched provider packages through its package store. The
-exercise validated each exact five-target map and native executable digest. On
-Apple Silicon macOS, all seven providers passed draft 3 setup description and
-negotiated handshakes. It also exercised actual declarative setup, explicit binary
-trust, workspace review and explicit approval.
+A separately compiled harness using the alpha.3 source-matched `PackageStore`
+validated and installed all 35 archives. This is package-format acceptance on
+macOS, not execution of foreign-target binaries. All seven native macOS providers
+passed draft 3 descriptions and negotiated handshakes. The exact packaged CLI,
+SHA-256 `33d366c9b7481bed551b9de41a81af95324984f36d145a03288cf9b2147630a8`,
+then exercised actual declarative setup, explicit trust, review and approval,
+and exact five-target maps and native digest resolution. The maps were explicitly
+applied to setup-generated local configuration, not selected through the public
+catalog.
 
 Negative checks confirmed that approval was not automatic. The host rejected a
-wrong approval fingerprint, missing credentials, a changed native pin, a missing
-target pin and a tampered target pin. These results qualify the exercised host and
+wrong approval fingerprint, missing credentials, and missing or changed native
+pins. These results qualify the exercised host and
 package paths for the exact source and binary pair recorded here. They do not set a
 minimum compatible host version or qualify different builds.
 
