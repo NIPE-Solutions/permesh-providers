@@ -16,6 +16,8 @@ availability are separate facts. The procedure for collecting new evidence is
 | Cloudflare 0.2.0 | Unpublished source candidate; no Cloudflare catalog entry | Shared candidate evidence below | No live acceptance record |
 | AWS IAM 0.2.0 | Unpublished source candidate; no AWS catalog entry | Shared candidate evidence below | No live acceptance record |
 
+| [GitLab 0.2.0](gitlab.md) | New unpublished source candidate; no catalog entry | Local synthetic HTTP, runtime and native setup/cancellation tests; no five-target artifact qualification | No live GitLab.com or self-managed version/edition acceptance |
+
 The audited candidate dependency pin is Permesh
 `0196197a215c0b244251fe1e3ca1eb759159776b`. Use that compatible host revision or a
 qualified successor; a minimum published CLI version is not established by this
@@ -47,6 +49,8 @@ E = grants/evidence. These names correspond to declared record capabilities.
 | [Google](google.md): Workspace Admin SDK Directory v1, one explicit stable `C…` customer; no `my_customer` or custom origin | A/I only; raw user IDs within instance, canonical `google:CUSTOMER:USER`; directory-attested primary email | Explicit host authority opt-in; archived → inactive, otherwise suspended → suspended, both false → active, missing flags → unknown; kind/affiliation unknown | No resource/grant/group/ownership collection; aliases, deleted users and recovery emails excluded |
 | [Cloudflare](cloudflare.md): hosted account IAM and visible zones, one account ID; no custom origin/Zero Trust collection | A/G/M/R/E; account-member IDs, group IDs, zone IDs, account and policy-scope resources | No I or authority; kind/affiliation/lifecycle unknown; accepted membership is not proof of active identity | Exact/wildcard policy assignments with native roles and unknown effective privilege. Wildcards stay separate evidence resources; denies/unsupported scopes suppress affected paths. No inferred ownership or transfer dependencies |
 | [AWS IAM](aws.md): one commercial AWS account, global IAM and configured regional STS; no GovCloud/China/Identity Center/Organizations | A/G/M/R/E; account-scoped immutable UserId/RoleId/GroupId/PolicyId; inline-policy key includes principal ID and mutable policy name | No I or authority; IAM users/roles retain unknown kind/affiliation/lifecycle | Observed policy attachments only, unknown privilege; no policy evaluation, role-assumption edges, root ownership or service resource inventory |
+
+GitLab is a newer, separately tested source addition and is not covered by the historical four-provider run above. It emits A/G/M/R/E for explicitly scoped HTTPS-origin groups/projects: direct member assignments and separately labeled collapsed effective membership, with origin/native-ID keys, no email authority and no invented inheritance paths. See its [exact scope, permissions and live procedure](gitlab.md).
 
 ## Authentication and visibility
 
