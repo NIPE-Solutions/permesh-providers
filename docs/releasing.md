@@ -48,8 +48,9 @@ The seven-provider release and qualification record is
 build, package verification and exact-package acceptance with the Permesh CLI
 `0.1.0-alpha.3` release have passed for the recorded local scope. This satisfies
 the tested package-store, trust, setup, workspace and protocol host gate for that
-exact pair. The record separately tracks public asset verification and catalog
-installation acceptance.
+exact pair. Public asset verification and seven-provider native catalog
+installation acceptance also passed for the recorded alpha.3 scope; four providers
+used guided portable setup and three used explicit native trust/setup/approval.
 This qualification record does not itself authorize publication or establish compatibility
 with a different host or rebuilt provider bytes.
 
