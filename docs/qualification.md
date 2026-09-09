@@ -2,8 +2,8 @@
 
 The historical four-provider audit covered revision
 `5353ce802f158fa6ad5412f38b98721beb97cd5d` on 2026-09-09. The current-source rows
-also describe the new GitLab, Entra and Identity Center candidates; their native
-qualification is pending. These are implemented observations, not complete
+also describe GitLab, Entra and Identity Center. The exact seven-provider native
+qualification record appears below; live acceptance remains separately scoped. These are implemented observations, not complete
 effective authorization. Source candidates, native builds, live acceptance and catalog
 availability are separate facts. The procedure for collecting new evidence is
 [live acceptance](live-acceptance.md).
@@ -13,13 +13,13 @@ availability are separate facts. The procedure for collecting new evidence is
 | Artifact | Catalog/install status | Automated/native evidence | Live evidence |
 | --- | --- | --- | --- |
 | GitHub 0.1.0 | Published in [catalog](../catalog/v1.json), five targets; legacy discovery 2 and setup 3 | [Release record](releases/github-0.1.0.md): five native targets, package validation and subprocess tests | Documented Apple Silicon health/query/admin parity; limited to that recorded scope |
-| GitHub 0.2.0 | Unpublished source candidate | Shared candidate evidence below | [Limited local macOS ARM64 acceptance](#limited-local-github-acceptance); no reproducible release qualification |
-| Google 0.2.0 | Unpublished source candidate; no Google catalog entry | Shared candidate evidence below | No live acceptance record |
-| Cloudflare 0.2.0 | Unpublished source candidate; no Cloudflare catalog entry | Shared candidate evidence below | No live acceptance record |
-| AWS IAM 0.2.0 | Unpublished source candidate; no AWS catalog entry | Shared candidate evidence below | No live acceptance record |
-| [GitLab 0.2.0](gitlab.md) | New unpublished source candidate; no catalog entry | Local synthetic HTTP, runtime and native setup/cancellation tests; no five-target artifact qualification | No live GitLab.com or self-managed version/edition acceptance |
-| [Entra 0.2.0](entra.md) | New unpublished source candidate; no catalog entry | Local synthetic Graph, negotiated host decoder, native setup/cancellation and proxy tests; no five-target artifact qualification | No live tenant/permission acceptance |
-| [AWS Identity Center 0.2.0](aws-identity-center.md) | New unpublished source binary; no catalog entry | Local signed SDK HTTP, host decoder, native setup/cancellation and proxy tests; no five-target artifact qualification | No live account/permission acceptance |
+| GitHub 0.2.0 | Unpublished source candidate | [Seven-provider native evidence](#seven-provider-native-evidence) | [Limited local macOS ARM64 acceptance](#limited-local-github-acceptance); no reproducible release qualification |
+| Google 0.2.0 | Unpublished source candidate; no Google catalog entry | [Seven-provider native evidence](#seven-provider-native-evidence) | No live acceptance record |
+| Cloudflare 0.2.0 | Unpublished source candidate; no Cloudflare catalog entry | [Seven-provider native evidence](#seven-provider-native-evidence) | No live acceptance record |
+| AWS IAM 0.2.0 | Unpublished source candidate; no AWS catalog entry | [Seven-provider native evidence](#seven-provider-native-evidence) | No live acceptance record |
+| [GitLab 0.2.0](gitlab.md) | New unpublished source candidate; no catalog entry | Synthetic HTTP/runtime tests and [five-target candidate verification](#seven-provider-native-evidence) | No live GitLab.com or self-managed version/edition acceptance |
+| [Entra 0.2.0](entra.md) | New unpublished source candidate; no catalog entry | Synthetic Graph/host/network tests and [five-target candidate verification](#seven-provider-native-evidence) | No live tenant/permission acceptance |
+| [AWS Identity Center 0.2.0](aws-identity-center.md) | New unpublished source binary; no catalog entry | AWS SigV4 mock/host/network tests and [five-target candidate verification](#seven-provider-native-evidence) | No live account/permission acceptance |
 
 The audited candidate dependency pin is Permesh
 `0196197a215c0b244251fe1e3ca1eb759159776b`. Use that compatible host revision or a
@@ -41,11 +41,39 @@ unsigned build outputs; successful jobs do not make them installable releases.
 passed Linux/macOS/Windows and Rust 1.94.1 checks. These references qualify their
 exact source revisions, not future changes or older operating systems.
 
-The current candidate workflow builds, tests, smokes and packages all seven
-binaries on the same five targets. Adding them to the matrix does not establish
-a successful run: GitLab, Entra and Identity Center remain pending until exact
-revision run results are recorded. No candidate catalog entries are published by
-this workflow.
+## Seven-provider native evidence
+
+[Native candidate run 34343615189](https://github.com/NIPE-Solutions/permesh-providers/actions/runs/34343615189)
+passed on all five targets for PR source
+[`ad5b348b6f37f2493d2c0729b715bafdc64e2877`](https://github.com/NIPE-Solutions/permesh-providers/commit/ad5b348b6f37f2493d2c0729b715bafdc64e2877).
+The workflow tested merge commit
+[`c0c86b7450091700959d7ec6971e6bbbd2eacfe0`](https://github.com/NIPE-Solutions/permesh-providers/commit/c0c86b7450091700959d7ec6971e6bbbd2eacfe0).
+Both commits reference source tree
+`bae6a7dd6086e60b3687b8155d7700e1978dd76a`.
+[CI](https://github.com/NIPE-Solutions/permesh-providers/actions/runs/34343615210)
+and [dependency checks](https://github.com/NIPE-Solutions/permesh-providers/actions/runs/34343615211)
+also passed for that PR source.
+
+The native jobs ran workspace and packaging tests, release builds, credential-free
+setup and negotiated cancellation smoke checks, and archive verification for
+GitHub, Google, Cloudflare, AWS IAM, GitLab, Entra and AWS Identity Center. The five
+targets are macOS ARM64/Intel, Linux GNU ARM64/x86_64 and Windows MSVC x86_64.
+
+All **35 candidate packages** from that same run were then downloaded and
+independently checked with the existing package verifier. The check covered the
+outer CI artifact digests, archive and executable SHA-256 values, checksum
+sidecars, native target headers, strict file layout, and combined project/dependency
+notice-bundle presence. Package identities matched their target and provider
+folders. No downloaded executable was run during this independent verification.
+
+These are unsigned trial artifacts with no release attestation. Hash and layout
+verification does not authenticate a publisher, prove reproducible builds or
+establish complete license compliance. The CI artifacts are temporarily retained;
+no catalog entry or release was published by this qualification. This evidence
+qualifies the exact source tree above, not the newer documentation commit or any
+future source change. It does not establish live API permissions, API-path coverage,
+other operating systems, or protocol stability. The limited local GitHub acceptance
+below remains separate; there is no new live qualification for the other providers.
 
 ## Limited local GitHub acceptance
 
