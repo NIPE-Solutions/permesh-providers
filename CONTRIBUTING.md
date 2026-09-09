@@ -5,6 +5,8 @@ This repository is establishing official provider distribution. Start with the
 [provider lifecycle](docs/provider-lifecycle.md). Installation and update commands
 belong in the [Permesh CLI repository](https://github.com/NIPE-Solutions/permesh).
 
+For a walkthrough, see [Build a provider](docs/development.md).
+
 Discuss a provider's API coverage and permission model before adding it. Keep
 changes focused, preserve stable provider identifiers and inheritance paths, and
 report uncertainty where an API cannot prove effective access. Provider code must
@@ -14,7 +16,7 @@ Use synthetic fixtures and local mock servers. Never commit credentials, private
 organization metadata, access reports or live API payloads. Ordinary tests must
 not depend on live credentials. Each implementation needs provider contract tests,
 API error and pagination coverage, documentation and cross-platform validation.
-Use stable Rust (minimum 1.91) and Python 3.12 or newer:
+Use stable Rust (minimum 1.94.1) and Python 3.12 or newer:
 
 ```bash
 cargo fmt --check
