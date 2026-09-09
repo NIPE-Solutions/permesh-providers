@@ -43,7 +43,7 @@ async fn exchange(origin: &str, check: bool) -> (Result<(), ProtocolFailure>, Ve
     let (reader, writer) = tokio::io::split(peer);
     let origin = origin.to_owned();
     let session = tokio::spawn(async move {
-        serve(reader, writer, move |id, orgs, token| {
+        serve(reader, writer, move |id, orgs, token, _network| {
             let mut p = GithubProvider::new(id, orgs, token)?;
             p.origin = reqwest::Url::parse(&origin).map_err(|_| crate::error("configuration"))?;
             Ok(p)
@@ -192,10 +192,9 @@ async fn cancellation_drops_an_in_flight_http_request() {
     let origin = format!("http://{}", listener.local_addr().unwrap());
     let (mut host, peer) = tokio::io::duplex(8192);
     let (reader, writer) = tokio::io::split(peer);
-    let session =
-        tokio::spawn(
-            async move { serve(reader, writer, move |_, _, _| Ok(provider(&origin))).await },
-        );
+    let session = tokio::spawn(async move {
+        serve(reader, writer, move |_, _, _, _| Ok(provider(&origin))).await
+    });
     host.write_all(b"{\"protocol_version\":1,\"id\":\"handshake\",\"method\":\"handshake\",\"operation\":\"check\",\"instance\":\"github-main\"}\n{\"protocol_version\":1,\"id\":\"check\",\"method\":\"check\",\"configuration\":{\"organizations\":[\"acme\"]},\"credentials\":{\"token\":\"SENTINEL-secret\"}}\n").await.unwrap();
     let (mut socket, _) = listener.accept().await.unwrap();
     let mut request = [0; 8192];
@@ -221,7 +220,7 @@ async fn abandoned_handshake_has_a_fixed_request_deadline() {
     let (_host, peer) = tokio::io::duplex(8192);
     let (reader, mut writer) = tokio::io::split(peer);
     let mut output = Vec::new();
-    let result = serve(reader, &mut output, GithubProvider::new).await;
+    let result = serve(reader, &mut output, GithubProvider::new_with_network).await;
     assert!(result.is_err());
     assert!(String::from_utf8(output).unwrap().contains("unavailable"));
     writer.shutdown().await.unwrap();

@@ -66,6 +66,7 @@ repository or using Rust.
 - [Cloudflare IAM observations and limits](docs/cloudflare.md)
 - [GitHub permissions and coverage](docs/github.md)
 - [GitHub installation and setup](docs/github-setup.md)
+- [Explicit proxy and additional CA support](docs/network.md)
 - [Dependency policy](docs/dependencies.md)
 - [Release qualification](docs/releasing.md)
 - [GitHub 0.1.0 qualification record](docs/releases/github-0.1.0.md)

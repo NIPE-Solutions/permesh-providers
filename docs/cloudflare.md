@@ -126,3 +126,9 @@ Live validation and five-target release qualification remain required before
 publishing an installable catalog entry.
 
 Current 0.2.0 source candidates require [explicit negotiated-v1 adoption](negotiated-v1.md).
+
+## Enterprise network settings
+
+Current source candidates support host-approved HTTPS proxy and additional CA
+settings through the negotiated `network_v1` feature. See [network configuration,
+limits and qualification](network.md). Ambient proxy variables are not inherited.

@@ -39,6 +39,14 @@ pub fn provider_metadata() -> Metadata {
 }
 impl GoogleProvider {
     pub fn new(id: String, customer_id: String, token: Secret) -> Result<Self, ProviderError> {
+        Self::new_with_network(id, customer_id, token, None)
+    }
+    pub fn new_with_network(
+        id: String,
+        customer_id: String,
+        token: Secret,
+        network: Option<&permesh_provider_sdk::network::NetworkContext>,
+    ) -> Result<Self, ProviderError> {
         if id.is_empty()
             || id.len() > 128
             || !id
@@ -53,7 +61,7 @@ impl GoogleProvider {
         {
             return Err(error("configuration"));
         }
-        let client = Client::builder()
+        let client = permesh_native_runtime::network::client_builder(network)?
             .redirect(reqwest::redirect::Policy::none())
             .connect_timeout(Duration::from_secs(5))
             .timeout(Duration::from_secs(15))

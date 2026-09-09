@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
 //! Single-operation discovery, setup and optional browser-auth descriptions.
 mod io;
+pub mod network;
 mod records;
 mod request;
 mod response;
 
 use io::{Input, Output};
-use permesh_provider_sdk::ProviderError;
 use permesh_provider_sdk::{Metadata, Provider, browser_auth::BrowserAuthSpec, setup::SetupSpec};
+use permesh_provider_sdk::{ProviderError, network::NetworkContext};
 use request::{Command, Operation, RequestContract};
 use serde::de::DeserializeOwned;
 use std::future::Future;
@@ -62,9 +63,48 @@ where
     Fut: Future<Output = Result<P, ProviderError>>,
     P: Provider,
 {
+    serve_internal::<A, _, _, _, _, _>(
+        reader,
+        writer,
+        false,
+        |id, configuration, credentials, _| factory(id, configuration, credentials),
+    )
+    .await
+}
+/// Serve negotiated network context only for an explicitly opted-in adapter.
+pub async fn serve_with_network<A, R, W, F, Fut, P>(
+    reader: R,
+    writer: W,
+    factory: F,
+) -> Result<(), ProtocolFailure>
+where
+    R: AsyncRead + Unpin,
+    W: AsyncWrite + Unpin,
+    A: Adapter,
+    F: FnOnce(String, A::Configuration, A::Credentials, Option<NetworkContext>) -> Fut,
+    Fut: Future<Output = Result<P, ProviderError>>,
+    P: Provider,
+{
+    serve_internal::<A, _, _, _, _, _>(reader, writer, true, factory).await
+}
+async fn serve_internal<A, R, W, F, Fut, P>(
+    reader: R,
+    writer: W,
+    network_enabled: bool,
+    factory: F,
+) -> Result<(), ProtocolFailure>
+where
+    R: AsyncRead + Unpin,
+    W: AsyncWrite + Unpin,
+    A: Adapter,
+    F: FnOnce(String, A::Configuration, A::Credentials, Option<NetworkContext>) -> Fut,
+    Fut: Future<Output = Result<P, ProviderError>>,
+    P: Provider,
+{
     let mut input = Input::new(reader);
     let mut output = Output::new(writer);
-    let result = session::<A, _, _, _, _, _>(&mut input, &mut output, factory).await;
+    let result =
+        session::<A, _, _, _, _, _>(&mut input, &mut output, network_enabled, factory).await;
     match result {
         Ok(()) => Ok(()),
         Err(Failure::Cancelled) => {
@@ -90,13 +130,14 @@ where
 async fn session<A, R, W, F, Fut, P>(
     input: &mut Input<R>,
     output: &mut Output<W>,
+    network_enabled: bool,
     factory: F,
 ) -> Result<(), Failure>
 where
     R: AsyncRead + Unpin,
     W: AsyncWrite + Unpin,
     A: Adapter,
-    F: FnOnce(String, A::Configuration, A::Credentials) -> Fut,
+    F: FnOnce(String, A::Configuration, A::Credentials, Option<NetworkContext>) -> Fut,
     Fut: Future<Output = Result<P, ProviderError>>,
     P: Provider,
 {
@@ -105,10 +146,14 @@ where
     let Command::Handshake {
         instance,
         operation,
+        network_requested,
     } = request.command
     else {
         return Err(Failure::Protocol);
     };
+    if network_requested && (!network_enabled || !A::supports_network()) {
+        return Err(Failure::Protocol);
+    }
     let metadata = A::metadata();
     let capabilities: Vec<_> = metadata
         .capabilities
@@ -116,7 +161,11 @@ where
         .map(records::capability)
         .collect();
     if output.contract == RequestContract::NegotiatedV1 {
-        output.send(&serde_json::json!({"event":"handshake","provider":metadata.kind,"capabilities":capabilities,"operations":["discover","check"],"draft":true})).await?;
+        let mut response = serde_json::json!({"event":"handshake","provider":metadata.kind,"capabilities":capabilities,"operations":["discover","check"],"draft":true});
+        if network_requested {
+            response["features"] = serde_json::json!(["network_v1"]);
+        }
+        output.send(&response).await?;
     } else {
         output.send(&serde_json::json!({"event":"handshake","provider":metadata.kind,"capabilities":capabilities,"draft":true})).await?;
     }
@@ -146,7 +195,11 @@ where
             check,
             configuration,
             credentials,
+            network,
         } => {
+            if network.is_some() != network_requested || (network.is_some() && !network_enabled) {
+                return Err(Failure::Protocol);
+            }
             output.id = if check { "check" } else { "discover" };
             if operation
                 != Some(if check {
@@ -156,6 +209,9 @@ where
                 })
             {
                 return Err(Failure::Protocol);
+            }
+            if let Some(context) = &network {
+                crate::network::validate(context).map_err(|_| Failure::Protocol)?;
             }
             let contract = output.contract;
             // Read cancellation concurrently, with no task that can outlive this session.
@@ -167,7 +223,7 @@ where
                     if request.contract==contract && matches!(request.command,Command::Cancel) {Err(Failure::Cancelled)} else {Err(Failure::Protocol)}
                 },
                 result=tokio::time::timeout(Duration::from_secs(55),async {
-                    let provider = factory(instance.clone(), configuration, credentials).await.map_err(|e| Failure::Provider(A::error_code(&e.code)))?;
+                    let provider = factory(instance.clone(), configuration, credentials, network).await.map_err(|e| Failure::Provider(A::error_code(&e.code)))?;
                     response::operation::<A, _, _>(&provider,check,&instance,output).await
                 })=>result.map_err(|_|Failure::Unavailable)?,
             }
@@ -180,6 +236,10 @@ pub trait Adapter {
     type Configuration: DeserializeOwned;
     type Credentials: DeserializeOwned;
     fn metadata() -> Metadata;
+    /// Opt in only when every outbound request applies the provided network context.
+    fn supports_network() -> bool {
+        false
+    }
     fn setup() -> SetupSpec;
     /// Optional credential-free description; login and keychain writes belong to the host.
     fn browser_auth() -> Option<BrowserAuthSpec> {

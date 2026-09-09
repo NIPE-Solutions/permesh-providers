@@ -15,6 +15,9 @@ struct Github;
 impl Adapter for Github {
     type Configuration = request::Configuration;
     type Credentials = request::Credentials;
+    fn supports_network() -> bool {
+        true
+    }
     fn metadata() -> Metadata {
         crate::provider_metadata()
     }
@@ -35,20 +38,25 @@ pub async fn run<R: AsyncRead + Unpin, W: AsyncWrite + Unpin>(
     reader: R,
     writer: W,
 ) -> Result<(), ProtocolFailure> {
-    serve(reader, writer, GithubProvider::new).await
+    serve(reader, writer, GithubProvider::new_with_network).await
 }
 async fn serve<R, W, F>(reader: R, writer: W, factory: F) -> Result<(), ProtocolFailure>
 where
     R: AsyncRead + Unpin,
     W: AsyncWrite + Unpin,
-    F: FnOnce(String, Vec<String>, Secret) -> Result<GithubProvider, ProviderError>,
+    F: FnOnce(
+        String,
+        Vec<String>,
+        Secret,
+        Option<&permesh_provider_sdk::network::NetworkContext>,
+    ) -> Result<GithubProvider, ProviderError>,
 {
-    permesh_native_runtime::serve::<Github, _, _, _, _, _>(
+    permesh_native_runtime::serve_with_network::<Github, _, _, _, _, _>(
         reader,
         writer,
-        |id, config, mut credentials| async move {
+        |id, config, mut credentials, network| async move {
             let token = Secret::new(std::mem::take(&mut *credentials.token));
-            factory(id, config.organizations, token)
+            factory(id, config.organizations, token, network.as_ref())
         },
     )
     .await

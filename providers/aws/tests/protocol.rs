@@ -99,3 +99,17 @@ async fn binary_rejects_draft_discovery_and_unselected_operations_before_credent
         assert!(String::from_utf8_lossy(&result.stdout).contains("protocol_error"));
     }
 }
+
+#[tokio::test]
+async fn network_feature_is_explicitly_unsupported_before_credentials() {
+    let input = format!(
+        "{}\n",
+        json!({"protocol_version":1,"id":"handshake","method":"handshake","instance":"aws-main","operation":"check","features":["network_v1"]})
+    );
+    let result = process(input.as_bytes()).await;
+    assert!(!result.status.success());
+    let response: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert_eq!(response["event"], "error");
+    assert_eq!(response["code"], "protocol_error");
+    assert!(result.stderr.is_empty());
+}

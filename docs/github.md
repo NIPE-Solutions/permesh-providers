@@ -91,3 +91,9 @@ above. The adapter itself only issues GET requests and never requests repository
 contents, messages or documents.
 
 Current source candidates require [explicit negotiated-v1 adoption](negotiated-v1.md).
+
+## Enterprise network settings
+
+Current source candidates support host-approved HTTPS proxy and additional CA
+settings through the negotiated `network_v1` feature. See [network configuration,
+limits and qualification](network.md). Ambient proxy variables are not inherited.

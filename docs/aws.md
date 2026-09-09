@@ -119,3 +119,9 @@ requests, native setup and queued cancellation. Live credential validation,
 five-platform artifacts and release qualification remain publication gates.
 
 Current 0.2.0 source candidates require [explicit negotiated-v1 adoption](negotiated-v1.md).
+
+## Enterprise network settings
+
+AWS does not implement the negotiated `network_v1` feature. It rejects that
+handshake before credentials or API access; it cannot silently bypass an approved
+proxy or CA requirement. See [current network support](network.md).

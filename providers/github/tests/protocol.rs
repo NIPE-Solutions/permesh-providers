@@ -113,3 +113,17 @@ async fn real_binary_rejects_draft2_discovery_handshake() {
     assert!(output.contains("protocol_error"));
     assert!(!output.contains("capabilities"));
 }
+
+#[path = "../../../crates/native-runtime/tests/support/process_network.rs"]
+mod process_network;
+#[tokio::test]
+async fn negotiated_network_routes_provider_api_through_explicit_proxy() {
+    process_network::check_proxy(
+        env!("CARGO_BIN_EXE_permesh-provider-github"),
+        "github-main",
+        serde_json::json!({"organizations":["acme"]}),
+        serde_json::json!({"token":"SENTINEL"}),
+        "api.github.com",
+    )
+    .await;
+}

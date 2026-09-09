@@ -43,6 +43,9 @@ struct Google;
 impl Adapter for Google {
     type Configuration = Configuration;
     type Credentials = Credentials;
+    fn supports_network() -> bool {
+        true
+    }
     fn metadata() -> Metadata {
         crate::provider_metadata()
     }
@@ -122,10 +125,10 @@ pub async fn run<R: AsyncRead + Unpin, W: AsyncWrite + Unpin>(
     reader: R,
     writer: W,
 ) -> Result<(), ProtocolFailure> {
-    permesh_native_runtime::serve::<Google, _, _, _, _, _>(
+    permesh_native_runtime::serve_with_network::<Google, _, _, _, _, _>(
         reader,
         writer,
-        |id, config, credentials| async move {
+        |id, config, credentials, network| async move {
             let token = match config.auth_mode {
                 AuthMode::AccessToken => secret(credentials.token)?,
                 AuthMode::RefreshToken => {
@@ -134,10 +137,10 @@ pub async fn run<R: AsyncRead + Unpin, W: AsyncWrite + Unpin>(
                     let client_id = config
                         .client_id
                         .ok_or_else(|| crate::error("configuration"))?;
-                    auth::refresh(&client_id, &refresh, &client_secret).await?
+                    auth::refresh(&client_id, &refresh, &client_secret, network.as_ref()).await?
                 }
             };
-            GoogleProvider::new(id, config.customer_id, token)
+            GoogleProvider::new_with_network(id, config.customer_id, token, network.as_ref())
         },
     )
     .await

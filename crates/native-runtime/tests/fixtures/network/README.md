@@ -1,0 +1,1 @@
+Synthetic localhost TLS fixtures for offline tests only. The server key is deliberately public test data and must never be used outside tests. The signing CA private key was discarded. The leaf expires September 2028 and must then be regenerated. Its 730-day lifetime satisfies platform certificate lifetime restrictions.
