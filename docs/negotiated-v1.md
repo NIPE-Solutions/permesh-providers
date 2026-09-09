@@ -61,15 +61,23 @@ and the publication gate above before adding it to the catalog.
   explicit non-archived/non-suspended users are active. Without a positive lifecycle flag, missing evidence remains
   unknown; malformed lifecycle observations make discovery incomplete.
 - AWS IAM policy attachments are observed policy-attachment evidence. Their
-  effective privilege remains unknown. This does not add Identity Center,
-  Organizations, or policy evaluation.
+  effective privilege remains unknown; the IAM binary does not enumerate Identity
+  Center or Organizations.
 - Cloudflare preserves role and scoped assignment observations, with account and
   zone resource kinds and observed hierarchy. Effective privilege remains unknown.
 
+- GitLab preserves direct and separately labeled collapsed effective membership
+  within approved groups/projects; it does not invent inheritance paths.
+- Entra preserves tenant/object IDs and direct directory memberships; explicit
+  host authority/mappings are required and UPN is not verified email.
+- The separate Identity Center binary preserves provisioned permission-set
+  assignments for an explicit account allowlist, always with unknown privilege.
+  Optional Organizations reads only decorate allowlisted account names.
+
 The runtime projects records into explicit public wire DTOs, validates the
 snapshot and instance boundary before emitting records, and sorts output.
-Completeness and known limitations remain part of discovery. No new provider
-permissions or content APIs are introduced.
+Completeness and known limitations remain part of discovery. Each new candidate
+guide lists its implemented read APIs and required permissions.
 
 ## Qualification
 
@@ -78,3 +86,7 @@ records with the pinned Permesh host decoder. Runtime tests cover framing,
 operation selection, invalid snapshots and cancellation. Native candidate jobs
 check setup and both negotiated handshakes without invoking APIs or supplying
 credentials. Offline success is not a live-provider qualification claim.
+
+The newer GitLab, Entra and Identity Center binaries have local synthetic/native
+checks; historical five-target runs do not qualify their new bytes. See the
+[qualification matrix](qualification.md) and [build guide](development.md).

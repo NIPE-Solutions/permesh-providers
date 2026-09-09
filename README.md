@@ -23,20 +23,27 @@ credentials you explicitly configure, and have no Permesh backend or telemetry.
 | [Google Workspace](docs/google.md) | Directory accounts and lifecycle; optional authoritative identities | Not published | 0.2.0 candidate |
 | [Cloudflare](docs/cloudflare.md) | Account members, IAM groups, roles and scoped policy assignments | Not published | 0.2.0 candidate |
 | [AWS IAM](docs/aws.md) | Users, roles, groups and managed/inline policy attachments | Not published | 0.2.0 candidate |
+| [GitLab](docs/gitlab.md) | Explicit groups/projects, direct members and separately labeled collapsed effective membership | Not published | 0.2.0 candidate |
+| [Microsoft Entra](docs/entra.md) | Proved-tenant directory accounts/identities, groups and direct user/group memberships | Not published | 0.2.0 candidate |
+| [AWS Identity Center](docs/aws-identity-center.md) | Selected store accounts/groups, direct memberships and provisioned permission-set assignments for allowlisted accounts | Not published | 0.2.0 candidate |
 
 **Installable** means qualified artifacts are listed in the [public catalog](catalog/v1.json).
 **Candidate** means implemented source with offline tests; it is not an installable
 release or a claim of complete live qualification. No provider is declared stable.
 
 GitHub 0.1.0 is available for macOS Apple Silicon and Intel, Linux GNU ARM64 and
-x86_64, and Windows x86_64. All four 0.2.0 candidates have native offline checks
-across those five targets. They require a compatible current-source CLI; see
+x86_64, and Windows x86_64. Recorded five-target runs cover earlier GitHub, Google,
+Cloudflare and IAM source revisions. GitLab, Entra and Identity Center have local
+synthetic/native checks; their five-target qualification remains pending. See the
+[exact qualification matrix](docs/qualification.md). Candidates require a compatible current-source CLI; see
 [candidate compatibility](docs/negotiated-v1.md). Source versions do not change
 already published binaries.
 
 Coverage matters more than the number of integrations. Google currently supplies
-directory identities, not group or resource grants. AWS does not yet cover Identity
-Center, Organizations or effective policy evaluation. Cloudflare assignments retain
+directory identities, not group or resource grants. AWS IAM inventories attachments;
+the separate Identity Center binary covers provisioned assignment observations and
+optional allowlisted organization account names. Neither evaluates effective AWS
+permissions. Cloudflare assignments retain
 unknown effective privilege. Each provider guide explains required permissions,
 observed evidence, visibility limits, and authentication.
 
@@ -134,6 +141,9 @@ handling and documentation are just as welcome as new integrations.
 | An authoritative Google directory | [Google Workspace](docs/google.md) |
 | Cloudflare membership and policy scope | [Cloudflare](docs/cloudflare.md) |
 | AWS IAM attachments and credential requirements | [AWS IAM](docs/aws.md) |
+| Scoped GitLab groups and projects | [GitLab](docs/gitlab.md) |
+| Microsoft directory authority and direct memberships | [Entra](docs/entra.md) |
+| AWS Identity Center assignment scope | [Identity Center](docs/aws-identity-center.md) |
 | Corporate proxy or additional CA | [Networking](docs/network.md) |
 | Develop and test an integration | [Provider development](docs/development.md) · [Contributing](CONTRIBUTING.md) |
 | Understand candidates and upgrades | [Compatibility](docs/negotiated-v1.md) · [Lifecycle](docs/provider-lifecycle.md) |

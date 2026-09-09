@@ -124,9 +124,13 @@ def notice_files(package, root):
     return sorted(found), directory, workspace
 
 
+def provider_package(provider):
+    return 'permesh-provider-' + ('aws' if provider == 'aws-identity-center' else provider)
+
+
 def reachable(metadata, provider='github'):
     packages = {package['id']: package for package in metadata['packages']}
-    roots = [p['id'] for p in metadata['packages'] if p['name'] == f'permesh-provider-{provider}']
+    roots = [p['id'] for p in metadata['packages'] if p['name'] == provider_package(provider)]
     if len(roots) != 1 or metadata.get('resolve') is None:
         raise ValueError('provider dependency graph is missing or ambiguous')
     nodes = {node['id']: node for node in metadata['resolve']['nodes']}

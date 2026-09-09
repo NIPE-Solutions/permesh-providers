@@ -55,8 +55,10 @@ jobs:
           BINARY_SUFFIX: ${{ matrix.suffix }}
         run: |
           mkdir candidate-output
-          for provider in github google cloudflare aws; do
-            cargo build --release --locked --package "permesh-provider-$provider" --bin "permesh-provider-$provider" --target "$TARGET"
+          for provider in github google cloudflare aws gitlab entra aws-identity-center; do
+            package="$provider"
+            if [ "$provider" = aws-identity-center ]; then package=aws; fi
+            cargo build --release --locked --package "permesh-provider-$package" --bin "permesh-provider-$provider" --target "$TARGET"
             python scripts/smoke_provider.py --provider "$provider" "target/$TARGET/release/permesh-provider-$provider$BINARY_SUFFIX"
             python scripts/package_provider.py --provider "$provider" --target "$TARGET" --output "candidate-output/$provider"
             python scripts/verify_package.py candidate-output/"$provider"/*.zip --entry "candidate-output/$provider/catalog-entry.json"

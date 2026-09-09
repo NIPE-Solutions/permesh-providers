@@ -12,7 +12,9 @@ import provider_notices
 
 TARGETS = ('aarch64-apple-darwin', 'x86_64-apple-darwin', 'x86_64-unknown-linux-gnu', 'aarch64-unknown-linux-gnu', 'x86_64-pc-windows-msvc')
 CAPABILITIES = ['accounts', 'resources', 'groups', 'memberships', 'grants']
-PROVIDERS = {'github': CAPABILITIES, 'google': ['accounts', 'identities'], 'cloudflare': CAPABILITIES, 'aws': CAPABILITIES}
+PROVIDERS = {'github': CAPABILITIES, 'google': ['accounts', 'identities'], 'cloudflare': CAPABILITIES, 'aws': CAPABILITIES,
+             'gitlab': CAPABILITIES, 'entra': ['accounts', 'identities', 'groups', 'memberships'],
+             'aws-identity-center': CAPABILITIES}
 MAX_ARCHIVE_BYTES = 128 * 1024 * 1024
 
 
@@ -50,7 +52,7 @@ def package(root, target, output, provider='github'):
         raise ValueError('unsupported target')
     root = Path(root).resolve(strict=True)
     metadata = cargo_metadata(root, target)
-    packages = [p for p in metadata['packages'] if p['name'] == f'permesh-provider-{provider}']
+    packages = [p for p in metadata['packages'] if p['name'] == provider_notices.provider_package(provider)]
     if len(packages) != 1:
         raise ValueError('provider package metadata is missing or ambiguous')
     version = packages[0]['version']

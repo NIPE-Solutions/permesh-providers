@@ -1,8 +1,10 @@
 # Provider capability and qualification matrix
 
-Audited against provider revision `5353ce802f158fa6ad5412f38b98721beb97cd5d`
-on 2026-09-09. This describes implemented observations, not complete effective
-authorization. Source candidates, native builds, live acceptance and catalog
+The historical four-provider audit covered revision
+`5353ce802f158fa6ad5412f38b98721beb97cd5d` on 2026-09-09. The current-source rows
+also describe the new GitLab, Entra and Identity Center candidates; their native
+qualification is pending. These are implemented observations, not complete
+effective authorization. Source candidates, native builds, live acceptance and catalog
 availability are separate facts. The procedure for collecting new evidence is
 [live acceptance](live-acceptance.md).
 
@@ -11,15 +13,12 @@ availability are separate facts. The procedure for collecting new evidence is
 | Artifact | Catalog/install status | Automated/native evidence | Live evidence |
 | --- | --- | --- | --- |
 | GitHub 0.1.0 | Published in [catalog](../catalog/v1.json), five targets; legacy discovery 2 and setup 3 | [Release record](releases/github-0.1.0.md): five native targets, package validation and subprocess tests | Documented Apple Silicon health/query/admin parity; limited to that recorded scope |
-| GitHub 0.2.0 | Unpublished source candidate | Shared candidate evidence below | No 0.2.0 live qualification record; 0.1.0 evidence does not qualify new bytes |
+| GitHub 0.2.0 | Unpublished source candidate | Shared candidate evidence below | [Limited local macOS ARM64 acceptance](#limited-local-github-acceptance); no reproducible release qualification |
 | Google 0.2.0 | Unpublished source candidate; no Google catalog entry | Shared candidate evidence below | No live acceptance record |
 | Cloudflare 0.2.0 | Unpublished source candidate; no Cloudflare catalog entry | Shared candidate evidence below | No live acceptance record |
 | AWS IAM 0.2.0 | Unpublished source candidate; no AWS catalog entry | Shared candidate evidence below | No live acceptance record |
-
 | [GitLab 0.2.0](gitlab.md) | New unpublished source candidate; no catalog entry | Local synthetic HTTP, runtime and native setup/cancellation tests; no five-target artifact qualification | No live GitLab.com or self-managed version/edition acceptance |
-
 | [Entra 0.2.0](entra.md) | New unpublished source candidate; no catalog entry | Local synthetic Graph, negotiated host decoder, native setup/cancellation and proxy tests; no five-target artifact qualification | No live tenant/permission acceptance |
-
 | [AWS Identity Center 0.2.0](aws-identity-center.md) | New unpublished source binary; no catalog entry | Local signed SDK HTTP, host decoder, native setup/cancellation and proxy tests; no five-target artifact qualification | No live account/permission acceptance |
 
 The audited candidate dependency pin is Permesh
@@ -41,6 +40,25 @@ unsigned build outputs; successful jobs do not make them installable releases.
 [Network implementation CI](https://github.com/NIPE-Solutions/permesh-providers/actions/runs/34297605972)
 passed Linux/macOS/Windows and Rust 1.94.1 checks. These references qualify their
 exact source revisions, not future changes or older operating systems.
+
+The current candidate workflow builds, tests, smokes and packages all seven
+binaries on the same five targets. Adding them to the matrix does not establish
+a successful run: GitLab, Entra and Identity Center remain pending until exact
+revision run results are recorded. No candidate catalog entries are published by
+this workflow.
+
+## Limited local GitHub acceptance
+
+On 2026-09-09, a locally built GitHub candidate on macOS ARM64 passed explicitly
+authorized read-only health, provider-status and stable-account JSON-query checks
+through the current-source CLI, including explicit executable trust and workspace
+approval. Results retained the expected visibility limitation and did not infer
+verified email or canonical identity. Evidence binds the exact tested local
+executable hashes; the shared build directory does not establish a reproducible
+complete source revision or released artifact. This is limited GitHub acceptance,
+not qualification of GitLab, Entra, Identity Center, other targets, every API path,
+or publication readiness. Retained evidence records observed source-tree equivalence;
+the exact full build commit was not proved.
 
 ## Implemented observations
 

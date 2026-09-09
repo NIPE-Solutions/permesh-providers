@@ -50,16 +50,20 @@ def smoke(binary, provider='github'):
         fields = {field['key']: field for step in spec['steps'] for field in step['fields']}
         if provider == 'github' and fields.get('organizations', {}).get('input', {}).get('type') != 'string_list':
             raise ValueError('GitHub setup is missing organization selection')
-        if provider != 'aws' and fields.get('token', {}).get('input', {}).get('type') != 'credential':
+        if provider not in ('aws', 'aws-identity-center') and fields.get('token', {}).get('input', {}).get('type') != 'credential':
             raise ValueError('Provider setup is missing a token-reference question')
-        if provider == 'aws':
+        if provider in ('aws', 'aws-identity-center'):
             expected_fields = {'account_id': ('text', True), 'region': ('text', True),
                                'access_key_id': ('credential', True), 'secret_access_key': ('credential', True),
-                               'session_token': ('credential', False), 'caller_role': ('text', False)}
+                               'session_token': ('credential', provider == 'aws-identity-center'),
+                               'caller_role': ('text', False)}
+            if provider == 'aws-identity-center':
+                expected_fields.update(instance_arn=('text', True), identity_store_id=('text', True),
+                                       accounts=('string_list', True), include_organizations=('boolean', True))
             if set(fields) != set(expected_fields) or any(
                     fields[key].get('input', {}).get('type') != kind or fields[key].get('required') is not required
                     for key, (kind, required) in expected_fields.items()):
-                raise ValueError('AWS setup must require account, region and key references with optional session token and caller role')
+                raise ValueError('AWS setup does not match its scoped credential-reference contract')
         if provider == 'cloudflare' and fields.get('account_id', {}).get('input', {}).get('type') != 'text':
             raise RuntimeError('Cloudflare setup missing account ID')
         if provider == 'google' and any(fields.get(key, {}).get('input', {}).get('type') != kind for key, kind in [('customer_id', 'text'), ('auth_mode', 'choice'), ('client_id', 'text'), ('refresh_token', 'credential'), ('client_secret', 'credential')]):
