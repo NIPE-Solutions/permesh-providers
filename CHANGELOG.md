@@ -10,6 +10,8 @@
   provider-owned resource kinds/parents, and access evidence. Validate snapshots
   before emitting records; preserve observed assignments without claiming
   effective authorization. See [migration requirements](docs/negotiated-v1.md).
+- Mark candidate package metadata explicitly as negotiated discovery, rejecting
+  conflicting legacy discovery claims. Published catalog entries are unchanged.
 - Qualify both negotiated operations through offline native handshake/cancellation
   smoke tests, without credentials or provider API requests.
 - Exclude conflicting GitHub account, repository, team and role observations

@@ -41,6 +41,14 @@ Release qualification must exercise install, trust, setup, approval and both
 operations on the matching host. No release or catalog update is part of this
 source migration.
 
+Candidate `catalog-entry.json` now includes `discovery_protocol: negotiated_v1`
+and lists only legacy setup in `protocols: [3]`. This is provisional candidate
+metadata, not an extension silently accepted by the published catalog schema.
+Current installers reject its unknown field. The archive verifier accepts this
+candidate shape and the historical legacy shape separately; it rejects combined
+negotiated and legacy discovery claims. The catalog/installer compatibility slice
+must establish the final distribution contract before publication.
+
 ## Preserved observations
 
 - GitHub distinguishes API-reported users and bots while leaving lifecycle and

@@ -14,10 +14,17 @@ from provider_notices import MAX_NOTICE_BYTES, regular_bytes
 def verify(archive, entry):
     archive, entry = Path(archive), Path(entry)
     release = json.loads(regular_bytes(entry, 16 * 1024))
-    if set(release) != {'provider', 'version', 'target', 'capabilities', 'protocols', 'archive_sha256', 'executable_sha256', 'archive_size'}:
+    fields = {'provider', 'version', 'target', 'capabilities', 'protocols', 'archive_sha256', 'executable_sha256', 'archive_size'}
+    if not isinstance(release, dict) or set(release) not in (fields, fields | {'discovery_protocol'}):
         raise ValueError('unexpected catalog entry fields')
+    negotiated = 'discovery_protocol' in release
+    if negotiated and release['discovery_protocol'] != 'negotiated_v1':
+        raise ValueError('unsupported candidate discovery contract')
+    protocols = release['protocols']
+    if not isinstance(protocols, list) or any(type(version) is not int for version in protocols) or protocols != ([3] if negotiated else [2, 3]):
+        raise ValueError('unexpected candidate protocol families')
     target = release['target']
-    if target not in TARGETS or release['provider'] not in PROVIDERS or release['protocols'] != [2, 3] or release['capabilities'] != PROVIDERS[release['provider']]:
+    if target not in TARGETS or release['provider'] not in PROVIDERS or release['capabilities'] != PROVIDERS[release['provider']]:
         raise ValueError('unexpected catalog release identity')
     if archive.name != f"permesh-provider-{release['provider']}-{release['version']}-{target}.zip":
         raise ValueError('archive name differs from release metadata')

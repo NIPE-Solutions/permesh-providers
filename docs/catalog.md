@@ -60,3 +60,7 @@ verify independent signatures or attestations. Repository ownership and release
 permissions are part of the trust boundary. Installation does not execute or
 trust binaries, and does not change workspace pins. See
 [distribution.md](distribution.md) for update and rollback behavior.
+
+Unpublished 0.2.0 candidates use provisional metadata described in the
+[negotiated-v1 guide](negotiated-v1.md). Do not copy these entries into the
+published v1 catalog; the matching installer contract is a publication gate.
