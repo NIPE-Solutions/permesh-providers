@@ -3,6 +3,27 @@
 Use the qualified `0.1.0` package from the official catalog. Review the release
 and its [coverage limitations](github.md) before granting execution trust.
 
+## Guided setup
+
+With a current Permesh CLI, start in a new workspace:
+
+```bash
+permesh init --organization Acme
+permesh provider add github --version 0.1.0
+permesh auth login github-main
+permesh doctor
+permesh user YOUR_GITHUB_LOGIN
+```
+
+Choose `keychain://github-main/token` during setup for the login step above.
+The command guides package selection, binary trust, configuration and workspace
+approval. See [required permissions](github.md) before creating a token.
+An environment reference is also supported; supply that value through your secret
+tooling instead of `auth login`.
+
+The remainder documents the advanced, separate steps. It describes published
+0.1.0; use the [candidate guide](negotiated-v1.md) for current source binaries.
+
 ## Install and trust
 
 ```bash
@@ -68,8 +89,9 @@ permesh user alice@example.com
 
 GitHub public email is not verified identity evidence. Configure an explicit
 identity alias mapping the account's immutable numeric GitHub ID (as a string)
-to the canonical identity, or look up the known GitHub login directly. Approval binds the full normalized workspace;
-configuration edits, including aliases, require another review and approval.
+to the canonical identity, or look up the known GitHub login directly. Current-source approval binds the selected provider’s execution context and relevant
+identity settings. Unrelated provider additions do not invalidate it. Older CLI
+releases used a wider fingerprint; follow the review result from your installed host.
 
 Health tests authentication and active organization membership. Successful health
 cannot prove every discovery endpoint is visible. Access results preserve partial
@@ -85,8 +107,8 @@ permesh provider migrate github-main --sha256 REVIEWED_SHA256
 ```
 
 Review the Git diff and run the review/approve steps above. Migration does not
-execute code, resolve credentials or grant approval. It changes the full workspace
-fingerprint, so every affected external instance needs renewed review/approval.
+execute code, resolve credentials or grant approval. Review and approve the migrated
+instance’s changed execution context.
 Do not create a duplicate instance with another ID just to migrate; aliases and
 provider account identifiers rely on the existing instance ID. See the
 [CLI migration guide](https://github.com/NIPE-Solutions/permesh/blob/main/docs/github-migration.md).

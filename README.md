@@ -1,18 +1,79 @@
 # Permesh providers
 
-Official providers for [Permesh](https://github.com/NIPE-Solutions/permesh).
+**Connect your systems. Understand who has access.**
 
-**Know who has access to what.**
+Official integrations for [Permesh](https://github.com/NIPE-Solutions/permesh),
+the local-first CLI for answering **who has access to what—and why**.
 
-This repository is the home for independently distributed, read-only Permesh
-providers and their release catalog. Providers discover access metadata directly
-from the services users configure. Permesh has no backend or telemetry.
+Providers read access metadata from your services: accounts, directory identities,
+teams, roles, and assignments. Permesh combines those observations into queries
+such as `permesh user alice@example.com`, `permesh admins`, and `permesh orphaned`.
 
-## Status
+Install only the integrations you need. They run on your machine, use the
+credentials you explicitly configure, and have no Permesh backend or telemetry.
 
-[GitHub provider 0.1.0](https://github.com/NIPE-Solutions/permesh-providers/releases/tag/github-v0.1.0)
-is available for macOS Apple Silicon and Intel, Linux GNU ARM64 and x86_64, and
-Windows x86_64. The [catalog](catalog/v1.json) lists the qualified packages.
+[Available providers](#available-providers) · [Install](#connect-your-first-provider) ·
+[Build your own](#connect-an-internal-or-unsupported-system) · [Contribute](CONTRIBUTING.md)
+
+## Available providers
+
+| Provider | What it discovers | Published package | Current source |
+| --- | --- | --- | --- |
+| [GitHub](docs/github.md) | Organization members/owners, repositories, teams, memberships and observed permissions | **0.1.0 — installable** | 0.2.0 candidate |
+| [Google Workspace](docs/google.md) | Directory accounts and lifecycle; optional authoritative identities | Not published | 0.2.0 candidate |
+| [Cloudflare](docs/cloudflare.md) | Account members, IAM groups, roles and scoped policy assignments | Not published | 0.2.0 candidate |
+| [AWS IAM](docs/aws.md) | Users, roles, groups and managed/inline policy attachments | Not published | 0.2.0 candidate |
+
+**Installable** means qualified artifacts are listed in the [public catalog](catalog/v1.json).
+**Candidate** means implemented source with offline tests; it is not an installable
+release or a claim of complete live qualification. No provider is declared stable.
+
+GitHub 0.1.0 is available for macOS Apple Silicon and Intel, Linux GNU ARM64 and
+x86_64, and Windows x86_64. All four 0.2.0 candidates have native offline checks
+across those five targets. They require a compatible current-source CLI; see
+[candidate compatibility](docs/negotiated-v1.md). Source versions do not change
+already published binaries.
+
+Coverage matters more than the number of integrations. Google currently supplies
+directory identities, not group or resource grants. AWS does not yet cover Identity
+Center, Organizations or effective policy evaluation. Cloudflare assignments retain
+unknown effective privilege. Each provider guide explains required permissions,
+observed evidence, visibility limits, and authentication.
+
+## Connect your first provider
+
+[Install Permesh](https://github.com/NIPE-Solutions/permesh/blob/main/docs/installation.md),
+then start with GitHub in a new directory:
+
+```bash
+mkdir company-access
+cd company-access
+permesh init --organization Acme
+permesh provider add github
+permesh auth login github-main
+permesh doctor
+permesh user YOUR_GITHUB_LOGIN
+permesh admins
+```
+
+The guided add command selects a compatible published package, asks you to trust
+its local execution, collects organization names and credential references, and
+asks you to approve the resulting instance. Choose `keychain://github-main/token`
+to use `auth login`. For an `env://` reference, supply the credential using your
+existing secret tooling instead.
+
+Start with a login; an email lookup needs verified identity evidence or an explicit
+mapping to the immutable account ID. Read the [GitHub setup guide](docs/github-setup.md)
+for permissions, multiple instances, scripting and updates.
+
+**The unpublished providers cannot currently be installed from the catalog.**
+Do not replace `github` with a candidate name and expect a public download.
+Contributors can build and explicitly register candidates using the
+[development guide](docs/development.md).
+
+## Install and update deliberately
+
+Use these commands to download a package separately from workspace setup:
 
 ```bash
 permesh provider install github --version 0.1.0
@@ -20,65 +81,70 @@ permesh provider update github --check
 permesh provider update github
 ```
 
-Continue with [binary trust, setup and workspace approval](docs/github-setup.md).
-Existing built-in GitHub configurations have an explicit
-[migration path](https://github.com/NIPE-Solutions/permesh/blob/main/docs/github-migration.md).
+`install` verifies and stores the package. It does not execute the provider or
+approve credential delivery. `update --check` checks metadata; `update` downloads
+a compatible newer version if available. Existing workspaces keep their selected
+executable until you explicitly adopt and approve a change.
 
-Updates are requested by the user. Ordinary access queries never check for
-updates. Downloading a package does not execute it, resolve credentials, or
-approve a workspace. Version selection and workspace adoption are separate
-operations; see the [distribution contract](docs/distribution.md).
+Normal queries never download or update providers. Artifacts and the catalog are
+hosted on GitHub; there is no plugin service to sign into. Checksums bind bytes to
+catalog entries, but the installer does not verify publisher signatures. Providers
+run as your user and are not sandboxed. See [distribution and trust](docs/distribution.md).
 
-Google Workspace Directory is available as an unpublished native candidate with
-access-token and refresh-token authentication. See [Google setup, permissions and
-coverage](docs/google.md).
+## Connect an internal or unsupported system
 
-AWS IAM attachment inventory is available as an unpublished native candidate with
-explicit access-key and optional session-token references. Attachments retain
-unknown effective privilege. See [AWS source](providers/aws) and
-[authentication, permissions and limits](docs/aws.md). Live qualification and
-catalog publication remain pending.
+You can write a provider without changing Permesh core or contributing it here.
+The subprocess protocol is language-independent: send validated NDJSON over
+stdin/stdout, and normalize the access metadata your system can expose.
 
-## Current source compatibility
+Production registration currently accepts self-contained native executables.
+A Python, Java or Node script is not directly installable as a command or interpreter
+invocation. The [Python protocol example](https://github.com/NIPE-Solutions/permesh/tree/main/examples/external-provider)
+is useful for learning the wire exchange; it does not bypass the native trust boundary.
 
-The 0.2.0 source candidates are unpublished. They use negotiated protocol v1
-for discovery and health, preserving identity lifecycle, resource hierarchy and
-access evidence. They require a compatible host and explicit workspace opt-in;
-see the [upgrade guide](docs/negotiated-v1.md). The published packages and catalog
-above remain unchanged.
+[Build a provider](docs/development.md) covers the SDK, protocol examples,
+normalization, setup forms, contract tests and explicit local registration.
+Your provider can declare its own configuration fields, conditional setup steps,
+and named credential slots. The CLI renders the prompts and handles references;
+providers never need to implement their own terminal wizard.
 
-## Repository responsibilities
+Third-party providers use the explicit technical trust workflow. They are never
+automatically executed because a cloned repository contains a plugin file.
 
-- Provider source, synthetic fixtures, API contract tests and limitations.
-- Provider-owned setup descriptions with CLI-owned prompts.
-- Independently versioned native releases and reviewed catalog metadata.
-- Authentication and minimum read-permission documentation for every provider.
+## Contribute an official provider
 
-The CLI, shared SDK, domain model and subprocess protocol remain in the
-[Permesh repository](https://github.com/NIPE-Solutions/permesh).
-Third-party and internal providers can use that protocol without joining this
-repository or using Rust.
+A useful contribution starts with a clear answer: which access question can this
+API answer, and what can it not prove?
+
+1. Propose the scope and minimum read permissions in a [provider request](https://github.com/NIPE-Solutions/permesh-providers/issues/new).
+2. Implement discovery with stable IDs, provenance and honest completeness.
+3. Add synthetic API fixtures and shared contract tests, including failures.
+4. Document authentication, setup, limitations and platform support.
+5. Submit a PR using the [contribution guide](CONTRIBUTING.md).
+
+Adding source does not automatically publish a package. Release qualification and
+catalog review are separate steps. Improvements to existing API coverage, error
+handling and documentation are just as welcome as new integrations.
 
 ## Documentation
 
-- [AWS IAM authentication and attachment evidence](docs/aws.md)
-- [Google Directory authentication and coverage](docs/google.md)
-- [Cloudflare IAM observations and limits](docs/cloudflare.md)
-- [GitHub permissions and coverage](docs/github.md)
-- [GitHub installation and setup](docs/github-setup.md)
-- [Explicit proxy and additional CA support](docs/network.md)
-- [Dependency policy](docs/dependencies.md)
-- [Release qualification](docs/releasing.md)
-- [GitHub 0.1.0 qualification record](docs/releases/github-0.1.0.md)
-- [Catalog schema and archive layout](docs/catalog.md)
-- [Distribution and explicit updates](docs/distribution.md)
-- [Provider migration and release acceptance](docs/provider-lifecycle.md)
-- [Contributing](CONTRIBUTING.md)
-- [Security reporting](SECURITY.md)
+| Need | Guide |
+| --- | --- |
+| GitHub setup, permissions and observations | [Setup](docs/github-setup.md) · [Coverage](docs/github.md) |
+| An authoritative Google directory | [Google Workspace](docs/google.md) |
+| Cloudflare membership and policy scope | [Cloudflare](docs/cloudflare.md) |
+| AWS IAM attachments and credential requirements | [AWS IAM](docs/aws.md) |
+| Corporate proxy or additional CA | [Networking](docs/network.md) |
+| Develop and test an integration | [Provider development](docs/development.md) · [Contributing](CONTRIBUTING.md) |
+| Understand candidates and upgrades | [Compatibility](docs/negotiated-v1.md) · [Lifecycle](docs/provider-lifecycle.md) |
+| Publish and verify packages | [Release qualification](docs/releasing.md) · [Catalog format](docs/catalog.md) |
+| Understand dependency choices | [Dependency policy](docs/dependencies.md) |
+
+The [CLI, SDK and protocol](https://github.com/NIPE-Solutions/permesh) live in the
+main repository. This repository owns official adapters, their tests, documentation,
+and release catalog. Report vulnerabilities through [SECURITY.md](SECURITY.md).
 
 ## License
 
-MIT. See [LICENSE](LICENSE). Third-party dependencies retain their own licenses
-and required notices in distribution archives.
-
-Cloudflare account members, IAM groups and scoped policy assignments are implemented as a native provider. Source and mock/protocol tests are available; live qualification and catalog publication remain pending. Observations retain unknown effective privilege.
+[MIT](LICENSE). Third-party dependencies retain their own licenses and required
+notices in distribution archives. No paid provider packs or provider-count limits.
