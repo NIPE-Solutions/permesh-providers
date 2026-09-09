@@ -13,7 +13,7 @@ availability are separate facts. The procedure for collecting new evidence is
 | Artifact | Catalog/install status | Automated/native evidence | Live evidence |
 | --- | --- | --- | --- |
 | GitHub 0.1.0 | Published in [catalog](../catalog/v1.json), five targets; legacy discovery 2 and setup 3 | [Release record](releases/github-0.1.0.md): five native targets, package validation and subprocess tests | Documented Apple Silicon health/query/admin parity; limited to that recorded scope |
-| GitHub 0.2.0 | Unpublished source candidate | Shared candidate evidence below | No 0.2.0 live qualification record; 0.1.0 evidence does not qualify new bytes |
+| GitHub 0.2.0 | Unpublished source candidate | Shared candidate evidence below | [Limited local macOS ARM64 acceptance](#limited-local-github-acceptance); no reproducible release qualification |
 | Google 0.2.0 | Unpublished source candidate; no Google catalog entry | Shared candidate evidence below | No live acceptance record |
 | Cloudflare 0.2.0 | Unpublished source candidate; no Cloudflare catalog entry | Shared candidate evidence below | No live acceptance record |
 | AWS IAM 0.2.0 | Unpublished source candidate; no AWS catalog entry | Shared candidate evidence below | No live acceptance record |
@@ -46,6 +46,19 @@ binaries on the same five targets. Adding them to the matrix does not establish
 a successful run: GitLab, Entra and Identity Center remain pending until exact
 revision run results are recorded. No candidate catalog entries are published by
 this workflow.
+
+## Limited local GitHub acceptance
+
+On 2026-09-09, a locally built GitHub candidate on macOS ARM64 passed explicitly
+authorized read-only health, provider-status and stable-account JSON-query checks
+through the current-source CLI, including explicit executable trust and workspace
+approval. Results retained the expected visibility limitation and did not infer
+verified email or canonical identity. Evidence binds the exact tested local
+executable hashes; the shared build directory does not establish a reproducible
+complete source revision or released artifact. This is limited GitHub acceptance,
+not qualification of GitLab, Entra, Identity Center, other targets, every API path,
+or publication readiness. Retained evidence records observed source-tree equivalence;
+the exact full build commit was not proved.
 
 ## Implemented observations
 
