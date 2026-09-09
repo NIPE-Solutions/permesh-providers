@@ -5,7 +5,8 @@ It is a development candidate; synthetic tests are not live-account qualificatio
 
 ## Authentication and configuration
 
-Configuration contains exactly `account_id` (twelve digits) and `region` (for
+Configuration contains `account_id` (twelve digits), optional `caller_role` (an exact
+STS assumed-role name), and `region` (for
 regional STS, for example `eu-west-1`). Credentials are named references:
 
 | Credential | Reference example | Required |
@@ -125,3 +126,8 @@ Current 0.2.0 source candidates require [explicit negotiated-v1 adoption](negoti
 AWS does not implement the negotiated `network_v1` feature. It rejects that
 handshake before credentials or API access; it cannot silently bypass an approved
 proxy or CA requirement. See [current network support](network.md).
+
+The optional `caller_role` binds STS to that exact role name before IAM reads; sessions
+may change during an explicitly approved external refresh. Role paths are not inferred.
+[Identity Center inventory](aws-identity-center.md) is a separate unpublished binary
+with its own instance/store/account scope and network support.

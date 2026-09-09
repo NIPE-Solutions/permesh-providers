@@ -53,6 +53,7 @@ async fn binary_describes_valid_setup_without_credentials_or_network() {
         [
             "account_id",
             "region",
+            "caller_role",
             "access_key_id",
             "secret_access_key",
             "session_token"
