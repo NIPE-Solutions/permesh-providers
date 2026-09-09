@@ -223,6 +223,24 @@ class PackageTests(unittest.TestCase):
         with zipfile.ZipFile(result) as archive:
             self.assertIn(b'Required SDK workspace license', archive.read('LICENSE'))
 
+    def test_new_candidates_package_their_exact_binary_and_dependency_root(self):
+        target = package.TARGETS[0]
+        source = self.binary(target)
+        for provider, crate, capabilities in [
+                ('gitlab', 'gitlab', package.CAPABILITIES),
+                ('entra', 'entra', ['accounts', 'identities', 'groups', 'memberships']),
+                ('aws-identity-center', 'aws', package.CAPABILITIES)]:
+            with self.subTest(provider=provider):
+                source.with_name(f'permesh-provider-{provider}').write_bytes(source.read_bytes())
+                self.metadata['packages'][0]['name'] = f'permesh-provider-{crate}'
+                archive = package.package(self.root, target, self.root / provider, provider)
+                verify_package.verify(archive, archive.parent / 'catalog-entry.json')
+                metadata = json.loads((archive.parent / 'catalog-entry.json').read_text())
+                self.assertEqual(metadata['provider'], provider)
+                self.assertEqual(sorted(metadata['capabilities']), sorted(capabilities))
+                with zipfile.ZipFile(archive) as stream:
+                    self.assertIn(f'permesh-provider-{crate}'.encode(), stream.read('LICENSE'))
+
 
 if __name__ == '__main__':
     unittest.main()

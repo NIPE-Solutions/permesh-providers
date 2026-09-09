@@ -1,8 +1,9 @@
 # Explicit enterprise network context
 
-Current GitHub, Google and Cloudflare source candidates support an explicitly
-approved HTTPS proxy and additional CA certificates. AWS does not support this
-feature: it rejects `network_v1` before accepting a configured operation. The
+Current GitHub, Google, Cloudflare, GitLab, Entra and AWS Identity Center source
+candidates support an explicitly approved HTTPS proxy and additional CA certificates.
+The AWS IAM binary does not support this feature: it rejects `network_v1` before
+accepting a configured operation. The
 published 0.1.x packages are unchanged; use a compatible host and a candidate
 binary that supports this feature.
 

@@ -78,3 +78,14 @@ publisher authenticity. The installer does not yet verify signatures or artifact
 attestations; GitHub repository/release control remains a distribution trust
 boundary. An SBOM is not currently shipped. Do not describe those features as
 implemented until their generation and client verification are tested.
+
+## New candidate binaries
+
+The native workflow builds and checks GitLab, Entra and the separate Identity Center
+binary on each target. Identity Center uses package `permesh-provider-aws` and binary
+`permesh-provider-aws-identity-center`; packaging/notice generation follows that AWS
+package dependency graph while retaining the distinct `aws-identity-center` identity.
+Use the corresponding `--provider` value for smoke, package and verification commands.
+The workflow produces unsigned review artifacts only. Historical runs do not qualify
+these additions; require a successful run for their exact source before recording
+five-target evidence, and complete the same live/install/publication gates separately.

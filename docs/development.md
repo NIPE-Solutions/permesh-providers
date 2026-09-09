@@ -28,6 +28,18 @@ cargo test --workspace --locked
 python3 scripts/smoke_provider.py --provider github target/debug/permesh-provider-github
 ```
 
+The workspace also builds `permesh-provider-gitlab`, `permesh-provider-entra` and
+`permesh-provider-aws-identity-center`. Identity Center is a second binary in the
+`permesh-provider-aws` package:
+
+```bash
+cargo build --locked -p permesh-provider-aws --bin permesh-provider-aws-identity-center
+python3 scripts/smoke_provider.py --provider aws-identity-center target/debug/permesh-provider-aws-identity-center
+```
+
+Use `--provider gitlab` or `--provider entra` with their correspondingly named
+binaries. These checks are offline; they do not establish live API qualification.
+
 On Windows use `python` if that is your Python command and append `.exe` to the
 binary path. The smoke test runs known local code deliberately with synthetic
 protocol input, no credentials, and no provider API requests. It does not grant
@@ -84,6 +96,14 @@ permesh provider setup github --id github-main --discovery-protocol negotiated-v
 
 This assumes you have explicitly trusted the local GitHub candidate under the
 registration ID `github`. Substitute your own registered ID for another provider.
+For example, after separately trusting those registration IDs:
+
+```bash
+permesh provider setup gitlab --id gitlab-main --discovery-protocol negotiated-v1
+permesh provider setup entra --id entra-main --discovery-protocol negotiated-v1
+permesh provider setup aws-identity-center --id center-main --discovery-protocol negotiated-v1
+```
+
 Review and approve the resulting instance before queries or credential delivery.
 Never overwrite a trusted executable during development and expect its old trust
 to remain valid; rebuild, inspect and register the new digest.

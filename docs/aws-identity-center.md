@@ -53,9 +53,8 @@ account need not be identical.
 | `sso:ListAccountAssignments` | User/group assignments for that account and permission set |
 | `organizations:ListAccounts` | Only with the explicit flag; names for allowlisted accounts |
 
-Review resource and condition scoping against the current
-[Identity Store authorization reference](https://docs.aws.amazon.com/service-authorization/latest/reference/list_identitystore.html)
-and [IAM Identity Center authorization reference](https://docs.aws.amazon.com/service-authorization/latest/reference/list_awsiamidentitycenter.html).
+Review service-specific resource and condition scoping in the current
+[AWS Service Authorization Reference](https://docs.aws.amazon.com/service-authorization/latest/reference/).
 This table identifies implemented reads; it is not a universal IAM policy or claim
 that every action supports identical resource restrictions. No write permission is
 required. Delegation, organization membership and permission-set provisioning affect
