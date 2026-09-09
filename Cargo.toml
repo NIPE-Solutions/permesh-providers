@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["providers/github", "providers/google", "providers/cloudflare", "crates/native-runtime", "providers/aws", "providers/gitlab"]
+members = ["providers/github", "providers/google", "providers/cloudflare", "crates/native-runtime", "providers/aws", "providers/gitlab", "providers/entra"]
 
 [workspace.package]
 version = "0.2.0"
