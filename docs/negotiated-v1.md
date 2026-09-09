@@ -35,19 +35,21 @@ published 0.1.x binaries keep their existing legacy workflow.
 
 **Publication gate:** the official installation/setup path must explicitly select
 and validate the new discovery contract before 0.2.0 packages enter the catalog.
-The current host default is legacy discovery. Do not publish a candidate into
-that default workflow and rely on users discovering a handshake failure.
+The pinned host selects the discovery contract from verified catalog metadata
+for guided official setup. Standalone setup and explicit external configuration
+retain the legacy default unless a selector is supplied. Older hosts that do not
+recognize this metadata are incompatible with these candidates.
 Release qualification must exercise install, trust, setup, approval and both
 operations on the matching host. No release or catalog update is part of this
 source migration.
 
 Candidate `catalog-entry.json` now includes `discovery_protocol: negotiated_v1`
-and lists only legacy setup in `protocols: [3]`. This is provisional candidate
-metadata, not an extension silently accepted by the published catalog schema.
-Current installers reject its unknown field. The archive verifier accepts this
-candidate shape and the historical legacy shape separately; it rejects combined
-negotiated and legacy discovery claims. The catalog/installer compatibility slice
-must establish the final distribution contract before publication.
+and lists only legacy setup in `protocols: [3]`. The pinned Permesh revision
+accepts and validates this metadata, as well as historical legacy entries. The
+archive verifier and matching host reject combined negotiated and legacy
+discovery claims. Candidate metadata is not evidence that an artifact has been
+published or qualified: validate the actual release through the matching host
+and the publication gate above before adding it to the catalog.
 
 ## Preserved observations
 
