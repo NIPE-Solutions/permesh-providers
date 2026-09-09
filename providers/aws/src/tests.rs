@@ -503,3 +503,22 @@ async fn shared_runtime_cross_decodes_policy_attachments_and_resource_kinds() {
     );
     server.abort();
 }
+
+#[tokio::test]
+async fn selected_caller_role_rejects_other_role_before_iam_inventory() {
+    let (mut p, t) = mock(|_, body| {
+        assert!(body.contains("GetCallerIdentity"));
+        (
+            200,
+            String::new(),
+            identity(ACCOUNT).replace(
+                &format!("arn:aws:iam::{ACCOUNT}:user/reader"),
+                &format!("arn:aws:sts::{ACCOUNT}:assumed-role/Other/session"),
+            ),
+        )
+    })
+    .await;
+    p.caller_role = Some("Approved".into());
+    assert_eq!(p.discover().await.unwrap_err().code, "account_mismatch");
+    t.abort();
+}

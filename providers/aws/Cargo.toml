@@ -14,6 +14,9 @@ permesh-provider-sdk.workspace = true
 permesh-secrets.workspace = true
 permesh-native-runtime = { path = "../../crates/native-runtime" }
 aws-sdk-iam = { version = "1.123.0", default-features = false, features = ["rt-tokio"] }
+aws-sdk-ssoadmin = { version = "1.114.0", default-features = false, features = ["rt-tokio"] }
+aws-sdk-identitystore = { version = "1.111.0", default-features = false, features = ["rt-tokio"] }
+aws-sdk-organizations = { version = "1.125.0", default-features = false, features = ["rt-tokio"] }
 aws-sdk-sts = { version = "1.114.0", default-features = false, features = ["rt-tokio"] }
 aws-credential-types = "1.3.0"
 aws-smithy-runtime-api = { version = "1", features = ["client"] }
@@ -27,3 +30,7 @@ time.workspace = true
 zeroize.workspace = true
 [dev-dependencies]
 permesh-provider-protocol.workspace = true
+
+[[bin]]
+name = "permesh-provider-aws-identity-center"
+path = "src/identity_center/main.rs"

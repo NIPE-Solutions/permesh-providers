@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 //! AWS IAM policy attachment inventory. No effective IAM evaluation or ambient authentication.
 mod auth;
+pub mod identity_center;
 pub mod protocol;
 mod records;
 mod transport;
@@ -23,6 +24,7 @@ pub struct AwsProvider {
     id: String,
     account: String,
     credentials: Credentials,
+    caller_role: Option<String>,
     iam: aws_sdk_iam::Client,
     sts: aws_sdk_sts::Client,
 }
@@ -115,9 +117,20 @@ impl AwsProvider {
             id,
             account,
             credentials,
+            caller_role: None,
             iam,
             sts,
         })
+    }
+    pub fn with_caller_role(mut self, role: Option<String>) -> Result<Self, ProviderError> {
+        if role
+            .as_deref()
+            .is_some_and(|s| !valid_role(s) || reflects(&self.credentials, s))
+        {
+            return Err(error("configuration"));
+        }
+        self.caller_role = role;
+        Ok(self)
     }
     async fn caller(&self) -> Result<(), ProviderError> {
         let output = self
@@ -127,9 +140,9 @@ impl AwsProvider {
             .await
             .map_err(|e| error(service_code(e.as_service_error().and_then(|e| e.code()))))?;
         if output.account() != Some(self.account.as_str())
-            || output.arn().is_none_or(|arn| {
-                !arn.starts_with("arn:aws:") || arn.split(':').nth(4) != Some(self.account.as_str())
-            })
+            || output
+                .arn()
+                .is_none_or(|arn| !caller_matches(arn, &self.account, self.caller_role.as_deref()))
         {
             return Err(error("account_mismatch"));
         }
@@ -282,3 +295,26 @@ fn error(code: &str) -> ProviderError {
 }
 #[cfg(test)]
 mod tests;
+
+pub(crate) fn valid_role(s: &str) -> bool {
+    !s.is_empty()
+        && s.len() <= 64
+        && s.bytes().all(|b| {
+            b.is_ascii_alphanumeric() || matches!(b, b'_' | b'+' | b'=' | b',' | b'.' | b'@' | b'-')
+        })
+}
+pub(crate) fn caller_matches(arn: &str, account: &str, role: Option<&str>) -> bool {
+    if arn.len() > 2048
+        || arn.chars().any(char::is_control)
+        || !arn.starts_with("arn:aws:")
+        || arn.split(':').nth(4) != Some(account)
+    {
+        return false;
+    }
+    role.is_none_or(|role| {
+        arn.strip_prefix(&format!("arn:aws:sts::{account}:assumed-role/{role}/"))
+            .is_some_and(|session| {
+                !session.is_empty() && session.len() <= 64 && !session.contains('/')
+            })
+    })
+}

@@ -13,6 +13,8 @@ use zeroize::Zeroizing;
 pub(crate) struct Configuration {
     account_id: String,
     region: String,
+    #[serde(default)]
+    caller_role: Option<String>,
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -42,6 +44,7 @@ impl Adapter for Aws {
         SetupSpec{schema_version:1,title:"AWS IAM attachment inventory".into(),description:"Inspect one account using explicit AWS credential references. No ambient AWS profile, SSO, credential process or endpoint configuration is loaded.".into(),steps:vec![SetupStep{id:"connection".into(),title:"Account and credential references".into(),description:"Requires iam:GetAccountAuthorizationDetails. STS GetCallerIdentity verifies the account. Temporary credentials require all three references and must remain valid for the collection.".into(),when:None,fields:vec![
 field("account_id","AWS account ID","Expected twelve-digit commercial AWS account ID.",true,Input::Text{min_length:12,max_length:12}),
 field("region","STS region","Commercial AWS region such as eu-west-1. IAM uses its global commercial endpoint.",true,Input::Text{min_length:9,max_length:32}),
+field("caller_role","Caller role name","Optional exact STS assumed-role name; required by host profile sources.",false,Input::Text{min_length:1,max_length:64}),
 field("access_key_id","Access key ID reference","Use env://NAME or keychain://INSTANCE/access_key_id.",true,Input::Credential),
 field("secret_access_key","Secret access key reference","Use env://NAME or keychain://INSTANCE/secret_access_key.",true,Input::Credential),
 field("session_token","Session token reference","Required for temporary credentials. Use env://NAME or keychain://INSTANCE/session_token. Refresh externally before collection.",false,Input::Credential),
@@ -50,6 +53,7 @@ field("session_token","Session token reference","Required for temporary credenti
     fn validate(c: &Configuration, k: &Credentials) -> bool {
         crate::valid_account(&c.account_id)
             && crate::valid_region(&c.region)
+            && c.caller_role.as_deref().is_none_or(crate::valid_role)
             && crate::auth::valid_values(
                 &k.access_key_id,
                 &k.secret_access_key,
@@ -92,6 +96,7 @@ pub async fn run<R: tokio::io::AsyncRead + Unpin, W: tokio::io::AsyncWrite + Unp
     writer: W,
 ) -> Result<(), ProtocolFailure> {
     permesh_native_runtime::serve::<Aws, _, _, _, _, _>(reader, writer, |id, c, mut k| async move {
+        let role = c.caller_role;
         crate::AwsProvider::new(
             id,
             c.account_id,
@@ -101,7 +106,8 @@ pub async fn run<R: tokio::io::AsyncRead + Unpin, W: tokio::io::AsyncWrite + Unp
             k.session_token
                 .as_mut()
                 .map(|v| Secret::new(std::mem::take(&mut **v))),
-        )
+        )?
+        .with_caller_role(role)
     })
     .await
 }

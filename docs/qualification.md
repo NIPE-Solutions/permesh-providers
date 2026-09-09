@@ -20,6 +20,8 @@ availability are separate facts. The procedure for collecting new evidence is
 
 | [Entra 0.2.0](entra.md) | New unpublished source candidate; no catalog entry | Local synthetic Graph, negotiated host decoder, native setup/cancellation and proxy tests; no five-target artifact qualification | No live tenant/permission acceptance |
 
+| [AWS Identity Center 0.2.0](aws-identity-center.md) | New unpublished source binary; no catalog entry | Local signed SDK HTTP, host decoder, native setup/cancellation and proxy tests; no five-target artifact qualification | No live account/permission acceptance |
+
 The audited candidate dependency pin is Permesh
 `0196197a215c0b244251fe1e3ca1eb759159776b`. Use that compatible host revision or a
 qualified successor; a minimum published CLI version is not established by this
@@ -55,6 +57,8 @@ E = grants/evidence. These names correspond to declared record capabilities.
 GitLab is a newer, separately tested source addition and is not covered by the historical four-provider run above. It emits A/G/M/R/E for explicitly scoped HTTPS-origin groups/projects: direct member assignments and separately labeled collapsed effective membership, with origin/native-ID keys, no email authority and no invented inheritance paths. See its [exact scope, permissions and live procedure](gitlab.md).
 
 Entra is another separately tested source addition, outside the historical four-provider CI evidence. It emits A/I/G/M for one authenticated public Graph v1 tenant, using tenant/object UUIDs. Optional service-principal objects do not imply service-principal membership coverage. User kind and Member affiliation remain unknown; Guest is external directory affiliation, not employment. Explicit host authority and account mappings are required; UPN is not verified email. No grants, resources, directory roles, Azure RBAC, PIM, invitations, tokens or sessions are collected. See [Entra scope, sufficient read permissions, bounds and live acceptance](entra.md).
+
+AWS Identity Center is a separate new binary; the earlier IAM evidence does not qualify it. It emits A/G/M/R/E for the approved instance/store and account allowlist, with provisioned-permission-set assignment evidence and unknown privilege. See [scope, permissions and live acceptance](aws-identity-center.md).
 
 ## Authentication and visibility
 
