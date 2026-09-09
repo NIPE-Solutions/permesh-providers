@@ -1,8 +1,10 @@
 # Provider capability and qualification matrix
 
-Audited against provider revision `5353ce802f158fa6ad5412f38b98721beb97cd5d`
-on 2026-09-09. This describes implemented observations, not complete effective
-authorization. Source candidates, native builds, live acceptance and catalog
+The historical four-provider audit covered revision
+`5353ce802f158fa6ad5412f38b98721beb97cd5d` on 2026-09-09. The current-source rows
+also describe the new GitLab, Entra and Identity Center candidates; their native
+qualification is pending. These are implemented observations, not complete
+effective authorization. Source candidates, native builds, live acceptance and catalog
 availability are separate facts. The procedure for collecting new evidence is
 [live acceptance](live-acceptance.md).
 
@@ -15,11 +17,8 @@ availability are separate facts. The procedure for collecting new evidence is
 | Google 0.2.0 | Unpublished source candidate; no Google catalog entry | Shared candidate evidence below | No live acceptance record |
 | Cloudflare 0.2.0 | Unpublished source candidate; no Cloudflare catalog entry | Shared candidate evidence below | No live acceptance record |
 | AWS IAM 0.2.0 | Unpublished source candidate; no AWS catalog entry | Shared candidate evidence below | No live acceptance record |
-
 | [GitLab 0.2.0](gitlab.md) | New unpublished source candidate; no catalog entry | Local synthetic HTTP, runtime and native setup/cancellation tests; no five-target artifact qualification | No live GitLab.com or self-managed version/edition acceptance |
-
 | [Entra 0.2.0](entra.md) | New unpublished source candidate; no catalog entry | Local synthetic Graph, negotiated host decoder, native setup/cancellation and proxy tests; no five-target artifact qualification | No live tenant/permission acceptance |
-
 | [AWS Identity Center 0.2.0](aws-identity-center.md) | New unpublished source binary; no catalog entry | Local signed SDK HTTP, host decoder, native setup/cancellation and proxy tests; no five-target artifact qualification | No live account/permission acceptance |
 
 The audited candidate dependency pin is Permesh
@@ -41,6 +40,12 @@ unsigned build outputs; successful jobs do not make them installable releases.
 [Network implementation CI](https://github.com/NIPE-Solutions/permesh-providers/actions/runs/34297605972)
 passed Linux/macOS/Windows and Rust 1.94.1 checks. These references qualify their
 exact source revisions, not future changes or older operating systems.
+
+The current candidate workflow builds, tests, smokes and packages all seven
+binaries on the same five targets. Adding them to the matrix does not establish
+a successful run: GitLab, Entra and Identity Center remain pending until exact
+revision run results are recorded. No candidate catalog entries are published by
+this workflow.
 
 ## Implemented observations
 
