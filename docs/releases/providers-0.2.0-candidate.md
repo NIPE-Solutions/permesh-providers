@@ -9,7 +9,7 @@ provider source below. Previous releases and drafts remain unchanged.
 
 Upgrade to Permesh CLI **0.1.0-alpha.3** before using this catalog. Alpha.2 rejects the new negotiated-v1 metadata even when selecting legacy 0.1.0. Existing installed packages, trust and workspace pins are not changed by a catalog update.
 
-Public catalog installation acceptance is tracked separately below.
+Public catalog installation acceptance passed for the scope recorded below.
 
 ## Published assets
 
@@ -75,10 +75,32 @@ visibility limitation and did not infer verified email or canonical identity.
 Admin discovery was not repeated. No broader live provider or API-path acceptance
 was performed.
 
+## Public catalog acceptance
+
+The separately reviewed [catalog PR 23](https://github.com/NIPE-Solutions/permesh-providers/pull/23)
+merged as `5ecb6d6be86b2e50cd01d6e81cd074735b298427`, adding the 35 original
+0.2.0 entries while preserving all five legacy entries. On 2026-09-09, the
+publicly downloaded alpha.3 Apple Silicon CLI installed all seven native 0.2.0
+packages through the production catalog and passed idempotent exact updates.
+Every executable digest matched the original metadata.
+
+GitHub, Google, Cloudflare and AWS IAM passed guided portable setup, including
+rejection without explicit consent and correct five-target catalog pins. GitLab,
+Entra and Identity Center passed public installation followed by explicit native
+trust, negotiated setup, review and approval; their reviewed five-target maps were
+applied explicitly. Alpha.3 does not offer guided add for those three types.
+Wrong approval fingerprints were rejected on the explicit path. All seven rejected
+absent credentials before API access. No live-provider credentials were supplied.
+
+An existing GitHub 0.1.0 workspace under alpha.3 retained its selected pin, exact
+workspace bytes, fingerprint and approval after a public update check found 0.2.0
+and an explicit update downloaded it. Downloading did not adopt a new workspace
+pin. This does not qualify migration of alpha.2 approvals. Temporary acceptance
+state was removed; no new live-provider acceptance is claimed.
+
 ## Remaining gates and limits
 
 These are unsigned evaluation releases promoted from the original workflow artifacts. The evidence does not establish publisher authentication, signatures,
 notarization, reproducible builds, complete license compliance, live API coverage,
-other operating systems or protocol stability. Public 0.2.0 catalog-guided installation and update are a separate acceptance
-gate following the reviewed catalog change. The earlier GitHub 0.1.0 catalog
-install/update result remains historical evidence.
+other operating systems or protocol stability. Public catalog acceptance is recorded above; broader live and desktop acceptance
+remain separate gates.

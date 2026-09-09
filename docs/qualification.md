@@ -43,6 +43,29 @@ unsigned build outputs; successful jobs do not make them installable releases.
 passed Linux/macOS/Windows and Rust 1.94.1 checks. These references qualify their
 exact source revisions, not future changes or older operating systems.
 
+## Public catalog acceptance
+
+The separately reviewed [catalog PR 23](https://github.com/NIPE-Solutions/permesh-providers/pull/23)
+merged as `5ecb6d6be86b2e50cd01d6e81cd074735b298427`, adding the 35 original
+0.2.0 entries while preserving all five legacy entries. On 2026-09-09, the
+publicly downloaded alpha.3 Apple Silicon CLI installed all seven native 0.2.0
+packages through the production catalog and passed idempotent exact updates.
+Every executable digest matched the original metadata.
+
+GitHub, Google, Cloudflare and AWS IAM passed guided portable setup, including
+rejection without explicit consent and correct five-target catalog pins. GitLab,
+Entra and Identity Center passed public installation followed by explicit native
+trust, negotiated setup, review and approval; their reviewed five-target maps were
+applied explicitly. Alpha.3 does not offer guided add for those three types.
+Wrong approval fingerprints were rejected on the explicit path. All seven rejected
+absent credentials before API access. No live-provider credentials were supplied.
+
+An existing GitHub 0.1.0 workspace under alpha.3 retained its selected pin, exact
+workspace bytes, fingerprint and approval after a public update check found 0.2.0
+and an explicit update downloaded it. Downloading did not adopt a new workspace
+pin. This does not qualify migration of alpha.2 approvals. Temporary acceptance
+state was removed; no new live-provider acceptance is claimed.
+
 ## Seven-provider native evidence
 
 [Exact-merge candidate run 34349822945](https://github.com/NIPE-Solutions/permesh-providers/actions/runs/34349822945)
