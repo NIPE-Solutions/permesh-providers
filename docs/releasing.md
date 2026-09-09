@@ -43,6 +43,16 @@ Before publishing 0.2.0 candidates, complete the host installation and workspace
 selection gate in [the upgrade guide](negotiated-v1.md). A successful native
 build alone does not establish installer compatibility.
 
+The current unpublished seven-provider candidate record is
+[providers 0.2.0](releases/providers-0.2.0-candidate.md). Its exact-merge native
+build, package verification and exact-package acceptance with the Permesh CLI
+`0.1.0-alpha.3` candidate have passed for the recorded local scope. This satisfies
+the tested package-store, trust, setup, workspace and protocol host gate for that
+exact pair. Public 0.2.0 catalog install/update remains untested because 0.2.0 is
+unpublished; only the published GitHub 0.1.0 catalog install/update path passed.
+This candidate record does not authorize publication or establish compatibility
+with a different host or rebuilt provider bytes.
+
 ## Publication
 
 Publication is an explicit maintainer operation; PR workflows have `contents:

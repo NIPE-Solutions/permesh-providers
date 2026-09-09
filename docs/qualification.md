@@ -13,13 +13,13 @@ availability are separate facts. The procedure for collecting new evidence is
 | Artifact | Catalog/install status | Automated/native evidence | Live evidence |
 | --- | --- | --- | --- |
 | GitHub 0.1.0 | Published in [catalog](../catalog/v1.json), five targets; legacy discovery 2 and setup 3 | [Release record](releases/github-0.1.0.md): five native targets, package validation and subprocess tests | Documented Apple Silicon health/query/admin parity; limited to that recorded scope |
-| GitHub 0.2.0 | Unpublished source candidate | [Seven-provider native evidence](#seven-provider-native-evidence) | [Limited local macOS ARM64 acceptance](#limited-local-github-acceptance); no reproducible release qualification |
-| Google 0.2.0 | Unpublished source candidate; no Google catalog entry | [Seven-provider native evidence](#seven-provider-native-evidence) | No live acceptance record |
-| Cloudflare 0.2.0 | Unpublished source candidate; no Cloudflare catalog entry | [Seven-provider native evidence](#seven-provider-native-evidence) | No live acceptance record |
-| AWS IAM 0.2.0 | Unpublished source candidate; no AWS catalog entry | [Seven-provider native evidence](#seven-provider-native-evidence) | No live acceptance record |
-| [GitLab 0.2.0](gitlab.md) | New unpublished source candidate; no catalog entry | Synthetic HTTP/runtime tests and [five-target candidate verification](#seven-provider-native-evidence) | No live GitLab.com or self-managed version/edition acceptance |
-| [Entra 0.2.0](entra.md) | New unpublished source candidate; no catalog entry | Synthetic Graph/host/network tests and [five-target candidate verification](#seven-provider-native-evidence) | No live tenant/permission acceptance |
-| [AWS Identity Center 0.2.0](aws-identity-center.md) | New unpublished source binary; no catalog entry | AWS SigV4 mock/host/network tests and [five-target candidate verification](#seven-provider-native-evidence) | No live account/permission acceptance |
+| GitHub 0.2.0 | Unpublished source candidate | [Seven-provider native and packaged host evidence](#seven-provider-native-evidence) | [Limited exact-package macOS ARM64 acceptance](#limited-local-github-acceptance); no reproducible release qualification |
+| Google 0.2.0 | Unpublished source candidate; no Google catalog entry | [Seven-provider native and packaged host evidence](#seven-provider-native-evidence) | No live acceptance record |
+| Cloudflare 0.2.0 | Unpublished source candidate; no Cloudflare catalog entry | [Seven-provider native and packaged host evidence](#seven-provider-native-evidence) | No live acceptance record |
+| AWS IAM 0.2.0 | Unpublished source candidate; no AWS catalog entry | [Seven-provider native and packaged host evidence](#seven-provider-native-evidence) | No live acceptance record |
+| [GitLab 0.2.0](gitlab.md) | New unpublished source candidate; no catalog entry | Synthetic HTTP/runtime tests and [native and packaged host verification](#seven-provider-native-evidence) | No live GitLab.com or self-managed version/edition acceptance |
+| [Entra 0.2.0](entra.md) | New unpublished source candidate; no catalog entry | Synthetic Graph/host/network tests and [native and packaged host verification](#seven-provider-native-evidence) | No live tenant/permission acceptance |
+| [AWS Identity Center 0.2.0](aws-identity-center.md) | New unpublished source binary; no catalog entry | AWS SigV4 mock/host/network tests and [native and packaged host verification](#seven-provider-native-evidence) | No live account/permission acceptance |
 
 The audited candidate dependency pin is Permesh
 `0196197a215c0b244251fe1e3ca1eb759159776b`. Use that compatible host revision or a
@@ -42,6 +42,38 @@ passed Linux/macOS/Windows and Rust 1.94.1 checks. These references qualify thei
 exact source revisions, not future changes or older operating systems.
 
 ## Seven-provider native evidence
+
+[Exact-merge candidate run 34349822945](https://github.com/NIPE-Solutions/permesh-providers/actions/runs/34349822945)
+passed all five native targets for merged source
+[`fde7472c2c32a30bbd885f7c8db6d73b178f4aa1`](https://github.com/NIPE-Solutions/permesh-providers/commit/fde7472c2c32a30bbd885f7c8db6d73b178f4aa1).
+Its seven providers produced 35 packages in one workflow run. All 35 downloaded
+packages passed independent verification of checksum sidecars, strict ZIP layout,
+catalog identity and target metadata, native executable headers, and combined
+project/dependency notice bundles. The downloaded outer artifact ZIP bytes also
+matched all five SHA-256 upload digests reported by GitHub. Exact hashes and the
+full candidate boundary are recorded in the
+[candidate release record](releases/providers-0.2.0-candidate.md).
+
+The host candidate selected for the compatibility exercise is Permesh CLI
+`0.1.0-alpha.3` source
+[`add7a725745f5e05415b330e8d6be61fcaaf5d67`](https://github.com/NIPE-Solutions/permesh/commit/add7a725745f5e05415b330e8d6be61fcaaf5d67).
+Provider package verification does not establish host-package qualification or compatibility.
+[CLI attested candidate run 34351503021](https://github.com/NIPE-Solutions/permesh/actions/runs/34351503021)
+passed all five targets, and independent verification of its bundle and public API
+covered all 20 subjects. The exact CLI binary used for local acceptance had SHA-256
+`33d366c9b7481bed551b9de41a81af95324984f36d145a03288cf9b2147630a8`.
+
+That exact CLI installed all 35 source-matched provider packages through the
+package store and validated the five-target maps and native executable digests.
+On macOS ARM64, all seven providers passed draft 3 setup description and negotiated
+handshakes; actual declarative setup, explicit executable trust and workspace review
+and approval were exercised. Negative checks confirmed no automatic approval and
+rejected a wrong approval fingerprint, absent credentials, changed native pins,
+missing target pins and tampered target pins. This qualifies the tested local
+package/host paths for the exact pair. It does not turn provider package verification
+into host qualification for other versions or environments.
+
+The earlier PR qualification remains useful historical evidence:
 
 [Native candidate run 34343615189](https://github.com/NIPE-Solutions/permesh-providers/actions/runs/34343615189)
 passed on all five targets for PR source
@@ -66,27 +98,30 @@ sidecars, native target headers, strict file layout, and combined project/depend
 notice-bundle presence. Package identities matched their target and provider
 folders. No downloaded executable was run during this independent verification.
 
-These are unsigned trial artifacts with no release attestation. Hash and layout
+Both runs produced unsigned trial artifacts with no release attestation. Hash and layout
 verification does not authenticate a publisher, prove reproducible builds or
 establish complete license compliance. The CI artifacts are temporarily retained;
 no catalog entry or release was published by this qualification. This evidence
-qualifies the exact source tree above, not the newer documentation commit or any
-future source change. It does not establish live API permissions, API-path coverage,
+qualifies only the exact source identified for each run, not any future source
+change. It does not establish live API permissions, API-path coverage,
 other operating systems, or protocol stability. The limited local GitHub acceptance
 below remains separate; there is no new live qualification for the other providers.
 
 ## Limited local GitHub acceptance
 
-On 2026-09-09, a locally built GitHub candidate on macOS ARM64 passed explicitly
-authorized read-only health, provider-status and stable-account JSON-query checks
-through the current-source CLI, including explicit executable trust and workspace
-approval. Results retained the expected visibility limitation and did not infer
-verified email or canonical identity. Evidence binds the exact tested local
-executable hashes; the shared build directory does not establish a reproducible
-complete source revision or released artifact. This is limited GitHub acceptance,
-not qualification of GitLab, Entra, Identity Center, other targets, every API path,
-or publication readiness. Retained evidence records observed source-tree equivalence;
-the exact full build commit was not proved.
+On 2026-09-09, the independently verified Apple Silicon GitHub package from run
+34349822945 passed the explicitly authorized NIPE-Solutions doctor/details,
+provider-status and stable-account JSON-query checks through the exact CLI candidate
+above. The GitHub executable SHA-256 was
+`9f2b82992c62767229af9af93dc5ddc3520d4e43e0a61513f621de1bb4688f02`.
+Explicit executable trust, declarative setup, workspace review and approval were
+exercised. Results retained the expected visibility limitation and did not infer
+verified email or canonical identity.
+
+This remains limited GitHub acceptance. Admin discovery was not repeated, and the
+authorization did not cover GitLab, Entra, Identity Center or broader live paths.
+It does not qualify every API path, make the unsigned artifacts reproducible, or
+establish publication readiness.
 
 ## Implemented observations
 
