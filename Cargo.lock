@@ -1621,6 +1621,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "permesh-provider-gitlab"
+version = "0.2.0"
+dependencies = [
+ "permesh-core",
+ "permesh-native-runtime",
+ "permesh-provider-protocol",
+ "permesh-provider-sdk",
+ "permesh-secrets",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "time",
+ "tokio",
+ "zeroize",
+]
+
+[[package]]
 name = "permesh-provider-google"
 version = "0.2.0"
 dependencies = [
