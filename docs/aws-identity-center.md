@@ -1,7 +1,7 @@
 # AWS Identity Center provider candidate
 
 `permesh-provider-aws-identity-center` is a separate native binary in the AWS crate,
-source version 0.2.0. It is unpublished and has not been live-account qualified.
+source version 0.2.0. It is a published evaluation prerelease and has not been live-account qualified.
 The existing [IAM attachment inventory](aws.md) remains a separate provider kind.
 This candidate collects directory accounts, groups, direct memberships and
 permission-set assignment evidence; it does not evaluate effective AWS permissions.
@@ -138,8 +138,10 @@ Run `cargo +1.94.1 test -p permesh-provider-aws` and
 Build the explicit binary with
 `cargo +1.94.1 build -p permesh-provider-aws --bin permesh-provider-aws-identity-center`.
 Register its exact executable digest and capabilities, complete host trust/approval,
-and select negotiated-v1 discovery before supplying credential references. There is
-no catalog entry, released artifact or five-target qualification claim for this binary.
+and select negotiated-v1 discovery before supplying credential references. Alternatively download with
+`permesh provider install aws-identity-center --version 0.2.0` using CLI alpha.3,
+then follow the same explicit native registration, trust and setup steps. Five-target artifact evidence and its limits are in the
+[qualification matrix](qualification.md).
 
 For a separately authorized live acceptance session:
 

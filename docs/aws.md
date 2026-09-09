@@ -129,5 +129,5 @@ proxy or CA requirement. See [current network support](network.md).
 
 The optional `caller_role` binds STS to that exact role name before IAM reads; sessions
 may change during an explicitly approved external refresh. Role paths are not inferred.
-[Identity Center inventory](aws-identity-center.md) is a separate unpublished binary
+[Identity Center inventory](aws-identity-center.md) is a separate evaluation prerelease binary
 with its own instance/store/account scope and network support.

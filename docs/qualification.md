@@ -13,13 +13,15 @@ availability are separate facts. The procedure for collecting new evidence is
 | Artifact | Catalog/install status | Automated/native evidence | Live evidence |
 | --- | --- | --- | --- |
 | GitHub 0.1.0 | Published in [catalog](../catalog/v1.json), five targets; legacy discovery 2 and setup 3 | [Release record](releases/github-0.1.0.md): five native targets, package validation and subprocess tests | Documented Apple Silicon health/query/admin parity; limited to that recorded scope |
-| GitHub 0.2.0 | Unpublished source candidate | [Seven-provider native and packaged host evidence](#seven-provider-native-evidence) | [Limited exact-package macOS ARM64 acceptance](#limited-local-github-acceptance); no reproducible release qualification |
-| Google 0.2.0 | Unpublished source candidate; no Google catalog entry | [Seven-provider native and packaged host evidence](#seven-provider-native-evidence) | No live acceptance record |
-| Cloudflare 0.2.0 | Unpublished source candidate; no Cloudflare catalog entry | [Seven-provider native and packaged host evidence](#seven-provider-native-evidence) | No live acceptance record |
-| AWS IAM 0.2.0 | Unpublished source candidate; no AWS catalog entry | [Seven-provider native and packaged host evidence](#seven-provider-native-evidence) | No live acceptance record |
-| [GitLab 0.2.0](gitlab.md) | New unpublished source candidate; no catalog entry | Synthetic HTTP/runtime tests and [native and packaged host verification](#seven-provider-native-evidence) | No live GitLab.com or self-managed version/edition acceptance |
-| [Entra 0.2.0](entra.md) | New unpublished source candidate; no catalog entry | Synthetic Graph/host/network tests and [native and packaged host verification](#seven-provider-native-evidence) | No live tenant/permission acceptance |
-| [AWS Identity Center 0.2.0](aws-identity-center.md) | New unpublished source binary; no catalog entry | AWS SigV4 mock/host/network tests and [native and packaged host verification](#seven-provider-native-evidence) | No live account/permission acceptance |
+| GitHub 0.2.0 | Published evaluation prerelease; five catalog targets | [Seven-provider native and packaged host evidence](#seven-provider-native-evidence) | [Limited exact-package macOS ARM64 acceptance](#limited-local-github-acceptance); no reproducible release qualification |
+| Google 0.2.0 | Published evaluation prerelease; five catalog targets | [Seven-provider native and packaged host evidence](#seven-provider-native-evidence) | No live acceptance record |
+| Cloudflare 0.2.0 | Published evaluation prerelease; five catalog targets | [Seven-provider native and packaged host evidence](#seven-provider-native-evidence) | No live acceptance record |
+| AWS IAM 0.2.0 | Published evaluation prerelease; five catalog targets | [Seven-provider native and packaged host evidence](#seven-provider-native-evidence) | No live acceptance record |
+| [GitLab 0.2.0](gitlab.md) | Published evaluation prerelease; five catalog targets | Synthetic HTTP/runtime tests and [native and packaged host verification](#seven-provider-native-evidence) | No live GitLab.com or self-managed version/edition acceptance |
+| [Entra 0.2.0](entra.md) | Published evaluation prerelease; five catalog targets | Synthetic Graph/host/network tests and [native and packaged host verification](#seven-provider-native-evidence) | No live tenant/permission acceptance |
+| [AWS Identity Center 0.2.0](aws-identity-center.md) | Published evaluation prerelease; five catalog targets | AWS SigV4 mock/host/network tests and [native and packaged host verification](#seven-provider-native-evidence) | No live account/permission acceptance |
+
+Upgrade to Permesh CLI **0.1.0-alpha.3** before using this catalog. Alpha.2 rejects the new negotiated-v1 metadata even when selecting legacy 0.1.0. Existing installed packages, trust and workspace pins are not changed by a catalog update.
 
 The audited candidate dependency pin is Permesh
 `0196197a215c0b244251fe1e3ca1eb759159776b`. Use that compatible host revision or a
@@ -54,7 +56,7 @@ matched all five SHA-256 upload digests reported by GitHub. Exact hashes and the
 full candidate boundary are recorded in the
 [candidate release record](releases/providers-0.2.0-candidate.md).
 
-The host candidate selected for the compatibility exercise is Permesh CLI
+The qualified release host selected for the compatibility exercise is Permesh CLI
 `0.1.0-alpha.3` source
 [`add7a725745f5e05415b330e8d6be61fcaaf5d67`](https://github.com/NIPE-Solutions/permesh/commit/add7a725745f5e05415b330e8d6be61fcaaf5d67).
 Provider package verification does not establish host-package qualification or compatibility.

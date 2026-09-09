@@ -1,5 +1,4 @@
 {
-  "schema_version": 1,
   "releases": [
     {
       "archive_sha256": "19a87dde8945f288ca97504bbae04586aa68611027b09fff558806454492611d",
@@ -95,6 +94,652 @@
       "provider": "github",
       "target": "x86_64-unknown-linux-gnu",
       "version": "0.1.0"
+    },
+    {
+      "archive_sha256": "2b0a333a47a588d57656e33eeab3373aaa169f5ac783b3d9c6d649644d77f806",
+      "archive_size": 3348836,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "c0140d97420be08b76f7462610d5d0182641279c4aad022cf5ed778ecc1490f9",
+      "protocols": [
+        3
+      ],
+      "provider": "aws",
+      "target": "aarch64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "e274027175372d096ee733e82e8ad46fcd6f27eb5fffcd68fadb40e6270d214c",
+      "archive_size": 3405118,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "3e1563612dcf65a0a5b81edd12c8776b8956faf868f3e5458d578bdc2ba54735",
+      "protocols": [
+        3
+      ],
+      "provider": "aws",
+      "target": "aarch64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "40bc9ad1dd684e1cc6adf2cd3ee2740a23bd5104486cf2b17935451f00870c2d",
+      "archive_size": 3557034,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "1566ba7918f404a85cb6b4b243a24ee30177142a8fe7a9c8a4ff796bf3447b33",
+      "protocols": [
+        3
+      ],
+      "provider": "aws",
+      "target": "x86_64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "01b1656820c42196886c7cacb6d1f7c9c3eab87ff1e7674dcff8c5a2dfe1ca1a",
+      "archive_size": 3199726,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "9639e96b627824d1c84d97ac0bf7387d46f638de65e58fc33129c770a6dfd465",
+      "protocols": [
+        3
+      ],
+      "provider": "aws",
+      "target": "x86_64-pc-windows-msvc",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "48f3b0cd342f6732f7d8d088b0625b4ff0745f23a7d6dc4b65fd9bdadb9379f1",
+      "archive_size": 3633915,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "d05079cb165bb3fc4e0b2a73cb789d4d8493f4aa1d67943d5f9f29c03d6e9f7d",
+      "protocols": [
+        3
+      ],
+      "provider": "aws",
+      "target": "x86_64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "83377a5d1fc521620dbe0d22460e3245c49fe56467abf0c99ff5e51655c616cb",
+      "archive_size": 3758306,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "baa52a911bed08ca74bb6d195b24aaa2c1dfcff6801355801ea473dc80768faf",
+      "protocols": [
+        3
+      ],
+      "provider": "aws-identity-center",
+      "target": "aarch64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "d2d4e1e7109973f67cf4ad55296817d1279997ed9812f251e399994722efc13b",
+      "archive_size": 3825751,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "568beff9ec075236200a5e9b78869f687d46e73908823812e1f35a82e0185deb",
+      "protocols": [
+        3
+      ],
+      "provider": "aws-identity-center",
+      "target": "aarch64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "62145703483a23905235bdcc6666bffdf75fec991753d7e613f35536db721c13",
+      "archive_size": 3987026,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "b9edbe9709172c3536e57af4cbf1954dda48778a2bd1af2a3decdddb3b43032c",
+      "protocols": [
+        3
+      ],
+      "provider": "aws-identity-center",
+      "target": "x86_64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "fb0b03ee872d8679fe50df19ef61a2b784555ead51e2a33c27c30409996ff4f8",
+      "archive_size": 3593235,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "33e687194c96be9b9e6b8ef9da2174b9d8016275ea82e38319863b6221de3aac",
+      "protocols": [
+        3
+      ],
+      "provider": "aws-identity-center",
+      "target": "x86_64-pc-windows-msvc",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "b4ba51325314fd5becfd4a5b47589f9ec1b791906e5fa5acd92b0c52ebf2ed2c",
+      "archive_size": 4088423,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "539603ae9bed03b05fa5da036aedb1efd9b0235424727df756c1d425ab7126b9",
+      "protocols": [
+        3
+      ],
+      "provider": "aws-identity-center",
+      "target": "x86_64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "372290b59bad51944a5b77644fb4883c13d1c1ed97f199f4ae46dc347a468a0c",
+      "archive_size": 2430457,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "141a4afcc3dcb5891d8a4396b88fd4a7066bdc8c47d18856a44588b6d0972d08",
+      "protocols": [
+        3
+      ],
+      "provider": "cloudflare",
+      "target": "aarch64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "3ca25576361a8d116ffc01e52ca5f91f1abf111f202628a183c0e2b3421f52ec",
+      "archive_size": 2450919,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "68b37b90a9d2d0cc1090622d3e29cfd16088d1c0b3b86b0bcdb37347752ccbd5",
+      "protocols": [
+        3
+      ],
+      "provider": "cloudflare",
+      "target": "aarch64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "778038454701e1ba782c1e24cc0e3679fbcc49305adbd3c8ceef6f6a68a1f0f1",
+      "archive_size": 2608139,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "7e228e4c8732e08912386c36d0835a395167c1ca86182281f6495ea74487943c",
+      "protocols": [
+        3
+      ],
+      "provider": "cloudflare",
+      "target": "x86_64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "47687f743128be8a4d1b409ecf4cbebe4ac6dddf7b73a07b087668a6d0993a5e",
+      "archive_size": 2269289,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "0fada3112ff335f3f77cf106bfc8add68a8416ca68d135cf453973e53424b219",
+      "protocols": [
+        3
+      ],
+      "provider": "cloudflare",
+      "target": "x86_64-pc-windows-msvc",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "2075faa106d2dba18b328a72164bb8106171803ce3bf08d8a0b6ff71b70fab63",
+      "archive_size": 2646288,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "6f10b9bef1ea3ff5f875959997466cc90be4cb55f75294f829386634a75796ed",
+      "protocols": [
+        3
+      ],
+      "provider": "cloudflare",
+      "target": "x86_64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "a36446515e2cb168efc1878f72d4cb726fe61de524b6fde000bfc9f8da45137d",
+      "archive_size": 2409729,
+      "capabilities": [
+        "accounts",
+        "identities",
+        "groups",
+        "memberships"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "50d113c675a532f38d48829cb24367d7a74f69cd068aec8ed649cd9fd7eb28a9",
+      "protocols": [
+        3
+      ],
+      "provider": "entra",
+      "target": "aarch64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "4a53aa4ccdc8e5da1fb309d8a3db2fdaab5e73921cff64aa62854edcbcb9806d",
+      "archive_size": 2430159,
+      "capabilities": [
+        "accounts",
+        "identities",
+        "groups",
+        "memberships"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "a448e60ce2f73a3121f518cb161c5f076fdf286e2d29122a6ad3bc7259f6267e",
+      "protocols": [
+        3
+      ],
+      "provider": "entra",
+      "target": "aarch64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "54180403087aaeefa868ea1b1c12f212bf9db29338c613657a804067bd5f5775",
+      "archive_size": 2579651,
+      "capabilities": [
+        "accounts",
+        "identities",
+        "groups",
+        "memberships"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "b49aada4da6d9ea76e7ac6c4d0ebd12458ef73d10f6209d63e75b3b67c006f3d",
+      "protocols": [
+        3
+      ],
+      "provider": "entra",
+      "target": "x86_64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "62a86281e6da5a35b24a62ab28ccbfa28261f8e339ac8d2830a6837e5c71d556",
+      "archive_size": 2243437,
+      "capabilities": [
+        "accounts",
+        "identities",
+        "groups",
+        "memberships"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "c8a70523e1a2e8e9b994e86ad496d1e8e220af0138286bc62e8ca1ba831deed7",
+      "protocols": [
+        3
+      ],
+      "provider": "entra",
+      "target": "x86_64-pc-windows-msvc",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "d29f1b9ebe2c4b521b2a14431fafad900834529680c63f1549cd4c0e93532056",
+      "archive_size": 2621645,
+      "capabilities": [
+        "accounts",
+        "identities",
+        "groups",
+        "memberships"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "5609a5f9c29cfb3fb87ea9c02d245d3c54ea12b0722620e7a23637499ff30bec",
+      "protocols": [
+        3
+      ],
+      "provider": "entra",
+      "target": "x86_64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "d4455b6f3f203aa8463cbe1d8662177c793a7cdcd8c28f15994588a6392a4d20",
+      "archive_size": 2471942,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "9f2b82992c62767229af9af93dc5ddc3520d4e43e0a61513f621de1bb4688f02",
+      "protocols": [
+        3
+      ],
+      "provider": "github",
+      "target": "aarch64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "2bf8f47cb6553caa870e794dd7c3fe74a232375bed04a774848e7691c468f313",
+      "archive_size": 2491903,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "020f4b896cfce00c6fba3a80edb5bf0c1745f82fbf98f752cfa9589da45a9c71",
+      "protocols": [
+        3
+      ],
+      "provider": "github",
+      "target": "aarch64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "2571b8ede89aec9ed51c24602abc4a30de585a106a18d983024d728d86d6b514",
+      "archive_size": 2645906,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "663190b31156dd0ac5eab91d6d323597f1c3f199f5bedc15a48e3ffbc82ab16a",
+      "protocols": [
+        3
+      ],
+      "provider": "github",
+      "target": "x86_64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "69244aa2d6437cd235eed979cb21e85a4ba12e2b560a4cbd1c9a5494299af0a1",
+      "archive_size": 2316604,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "8db26c495dc59c7cbfdc86248de603acc65e721648489892bcd73de2dd16dd3f",
+      "protocols": [
+        3
+      ],
+      "provider": "github",
+      "target": "x86_64-pc-windows-msvc",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "45fa37961c0e773273afd535c54e134b76da1b3476373d1d2c35d9239a812614",
+      "archive_size": 2687029,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "cf31122f1495679ba75ef6b8f34fc7ddeded2b5b8d76bae9572b7aac4d21792c",
+      "protocols": [
+        3
+      ],
+      "provider": "github",
+      "target": "x86_64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "442ebb93e0a6278dcdc267568a3b2b5587cc1e2260460e317a67f78c97dc5ea2",
+      "archive_size": 2471400,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "93c9c1717cd7881d5276a55a8c69c1b1a567465ee040cbc15d7dd1d4d6d56b29",
+      "protocols": [
+        3
+      ],
+      "provider": "gitlab",
+      "target": "aarch64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "bac6f56ee5f594c517965833b03827e6c125ddb9443531385cd088929e75409e",
+      "archive_size": 2490834,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "90c91095ae09e9deab2948c828618d183c2e41d936f0593832cdba92f01f4c8d",
+      "protocols": [
+        3
+      ],
+      "provider": "gitlab",
+      "target": "aarch64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "746f14f0a57ca96918145d9f82a7f1b2a85b08baad667421ba532866284357bb",
+      "archive_size": 2649466,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "fc22ac8a57104aa3e3e8feecf78474933379aec0afd81a0eacdd5f2b3e483a3d",
+      "protocols": [
+        3
+      ],
+      "provider": "gitlab",
+      "target": "x86_64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "74ddaf1e7a477e9f50337d240bc4ba2b0d1c95c14a25687f037079b20b99e39e",
+      "archive_size": 2316537,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "4c573c5b18ab3fb32fbdf8966b951073000112dfe187e8477199074e7763f877",
+      "protocols": [
+        3
+      ],
+      "provider": "gitlab",
+      "target": "x86_64-pc-windows-msvc",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "459dec87fa38d0d969a4d8853715180ba623b04cf41ed562b57b94583d10f4f6",
+      "archive_size": 2685634,
+      "capabilities": [
+        "accounts",
+        "resources",
+        "groups",
+        "memberships",
+        "grants"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "3f42edaa21592ef90e9046206fae8a39ac5dda9052a54fa6ffe88965eff37e6a",
+      "protocols": [
+        3
+      ],
+      "provider": "gitlab",
+      "target": "x86_64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "3f61eaf63c07cd076488a16ca31d8ed039a3078d5ebe5108c980f3add1f9d219",
+      "archive_size": 2441942,
+      "capabilities": [
+        "accounts",
+        "identities"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "619ff97c32d7f8083b8ec75deb3ca7207c3b9042a99fae9629f8a92183e4b414",
+      "protocols": [
+        3
+      ],
+      "provider": "google",
+      "target": "aarch64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "ebf427e9f8a0dc47f12143d3145a1adde9cfcf6ad30329ffb559879fae6c7949",
+      "archive_size": 2463157,
+      "capabilities": [
+        "accounts",
+        "identities"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "60417b538804c2f25dc2d06e3a34d6a5ed0379190927932063b7175cc7004c45",
+      "protocols": [
+        3
+      ],
+      "provider": "google",
+      "target": "aarch64-unknown-linux-gnu",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "cfa953acb24316823aca4ba11c4fdd21e4b44f60fa8e7c50a819450eb1f02a64",
+      "archive_size": 2616098,
+      "capabilities": [
+        "accounts",
+        "identities"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "c7efad53477350e550fb77b159b7b8af98bcd049141187e73db36a5d7eff9d6a",
+      "protocols": [
+        3
+      ],
+      "provider": "google",
+      "target": "x86_64-apple-darwin",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "404bf59338897d81afe127db9100ab538490e9a6d10f66da87b9ea5fcf1275a7",
+      "archive_size": 2258823,
+      "capabilities": [
+        "accounts",
+        "identities"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "8654028ac1707c983b94bf7e04c221ffea1880df484728f270a81ddec1a99eaf",
+      "protocols": [
+        3
+      ],
+      "provider": "google",
+      "target": "x86_64-pc-windows-msvc",
+      "version": "0.2.0"
+    },
+    {
+      "archive_sha256": "bcdd632ee2be19a13594803285d7fa2ef3ad0104a37c9312bb1e35c655fc88f1",
+      "archive_size": 2649525,
+      "capabilities": [
+        "accounts",
+        "identities"
+      ],
+      "discovery_protocol": "negotiated_v1",
+      "executable_sha256": "1322654252a688568c2ce7d1d11ffd331203d611535ab307ca31c01f8e02a84c",
+      "protocols": [
+        3
+      ],
+      "provider": "google",
+      "target": "x86_64-unknown-linux-gnu",
+      "version": "0.2.0"
     }
-  ]
+  ],
+  "schema_version": 1
 }
