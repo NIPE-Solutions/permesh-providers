@@ -7,8 +7,8 @@ use aws_sdk_iam::{
     },
 };
 use permesh_core::{
-    Account, Certainty, EntityKey, Grant, Group, IdentityKind, Membership, Privilege, Provenance,
-    Resource, Subject,
+    Account, Affiliation, Certainty, EntityKey, EvidenceKind, Grant, Group, IdentityKind,
+    IdentityStatus, Membership, Privilege, Provenance, Resource, Subject,
 };
 use std::collections::BTreeMap;
 #[derive(Default)]
@@ -67,6 +67,8 @@ impl Collected {
                     arn.split(':').nth(4).unwrap_or_default()
                 )),
                 name: name.into(),
+                kind: Some("aws.managed_policy".into()),
+                parent: None,
             };
             if policy_map.insert(arn.to_owned(), resource).is_some() {
                 policy_conflicts.insert(arn.to_owned());
@@ -141,6 +143,8 @@ impl Collected {
                 key: k.clone(),
                 login: name.into(),
                 kind: IdentityKind::Unknown,
+                affiliation: Affiliation::Unknown,
+                status: IdentityStatus::Unknown,
                 verified_emails: vec![],
             });
             for group in v.group_list() {
@@ -183,6 +187,8 @@ impl Collected {
                 key: k.clone(),
                 login: name.into(),
                 kind: IdentityKind::Unknown,
+                affiliation: Affiliation::Unknown,
+                status: IdentityStatus::Unknown,
                 verified_emails: vec![],
             });
             self.attachments(
@@ -249,6 +255,8 @@ impl Collected {
             let resource = Resource {
                 key: EntityKey::new(&p.id, format!("inline:{sid}:{name}")),
                 name: name.into(),
+                kind: Some("aws.inline_policy".into()),
+                parent: None,
             };
             targets.insert(resource.key.clone(), resource.name.clone());
             s.resources.push(resource);
@@ -261,6 +269,7 @@ impl Collected {
                 role,
                 privilege: Privilege::Unknown,
                 certainty: Certainty::Observed,
+                evidence_kind: EvidenceKind::PolicyAttachment,
                 provenance: provenance.clone(),
             });
         }

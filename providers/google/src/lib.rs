@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 //! Read-only Google Workspace Directory identity source.
-use permesh_core::{Account, EntityKey, Identity, IdentityKind, IdentityStatus, Snapshot};
+use permesh_core::{
+    Account, Affiliation, EntityKey, Identity, IdentityKind, IdentityStatus, Snapshot,
+};
 use permesh_provider_sdk::{
     Capability, Health, Metadata, Provider, ProviderError, ProviderFuture, validate_snapshot,
 };
@@ -18,7 +20,7 @@ const PAGE_SIZE: usize = 500;
 const VISIBILITY: &[&str] = &[
     "Google Directory users.list is an identity source for the configured customer. Collection is not transactional; directory visibility depends on the delegated administrator and OAuth scope.",
     "Only primaryEmail is directory-attested for exact email correlation; aliases, secondary and recovery emails are excluded. This is not proof of mailbox ownership or employee status.",
-    "Identity kind is unknown. Active means both suspended and archived are explicitly false; absent status fields remain unknown. Deleted users, groups, memberships, resources and grants are not enumerated.",
+    "Identity kind and affiliation are unknown. Archived means inactive; otherwise suspended means suspended. Active means both suspended and archived are explicitly false; incomplete status evidence remains unknown. Deleted users, groups, memberships, resources and grants are not enumerated.",
     "OAuth access tokens are supplied directly or obtained once per invocation from the configured refresh credential; no tokens are persisted. Health checks probe at most one user and do not establish complete directory visibility.",
 ];
 pub struct GoogleProvider {
@@ -99,8 +101,10 @@ impl GoogleProvider {
         let malformed = ["suspended", "archived"]
             .iter()
             .any(|key| value.get(key).is_some_and(|v| !v.is_boolean()));
-        let status = if suspended == Some(true) || archived == Some(true) {
+        let status = if archived == Some(true) {
             IdentityStatus::Inactive
+        } else if suspended == Some(true) {
+            IdentityStatus::Suspended
         } else if !malformed && suspended == Some(false) && archived == Some(false) {
             IdentityStatus::Active
         } else {
@@ -111,11 +115,14 @@ impl GoogleProvider {
                 key: EntityKey::new(&self.id, id),
                 login: email.into(),
                 kind: IdentityKind::Unknown,
+                affiliation: Affiliation::Unknown,
+                status,
                 verified_emails: vec![email.into()],
             },
             Identity {
                 id: identity_id,
                 kind: IdentityKind::Unknown,
+                affiliation: Affiliation::Unknown,
                 status,
                 verified_emails: vec![email.into()],
             },

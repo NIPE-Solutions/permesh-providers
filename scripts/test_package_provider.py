@@ -94,7 +94,8 @@ class PackageTests(unittest.TestCase):
                 metadata = json.loads((one.parent / 'catalog-entry.json').read_text())
                 self.assertEqual(metadata['provider'], 'github')
                 self.assertEqual(metadata['version'], '0.1.0')
-                self.assertEqual(metadata['protocols'], [2, 3])
+                self.assertEqual(metadata['protocols'], [3])
+                self.assertEqual(metadata['discovery_protocol'], 'negotiated_v1')
                 self.assertEqual(metadata['target'], target)
                 self.assertEqual(metadata['archive_sha256'], digest)
                 self.assertEqual(metadata['executable_sha256'], hashlib.sha256(native(target)).hexdigest())
@@ -135,6 +136,26 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(metadata['provider'], 'cloudflare')
         self.assertEqual(metadata['capabilities'], ['accounts', 'resources', 'groups', 'memberships', 'grants'])
         self.assertNotIn('identities', metadata['capabilities'])
+
+    def test_candidate_metadata_rejects_legacy_discovery_claims(self):
+        target = package.TARGETS[0]
+        self.binary(target)
+        archive = package.package(self.root, target, self.root / 'out')
+        entry = archive.parent / 'catalog-entry.json'
+        original = json.loads(entry.read_text())
+        self.assertEqual(original.get('discovery_protocol'), 'negotiated_v1')
+        for field, value in [('discovery_protocol', 'legacy'), ('discovery_protocol', None),
+                             ('protocols', [2, 3]), ('protocols', [3.0])]:
+            changed = dict(original)
+            changed[field] = value
+            entry.write_text(json.dumps(changed))
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                verify_package.verify(archive, entry)
+        legacy = dict(original)
+        legacy.pop('discovery_protocol')
+        legacy['protocols'] = [2, 3]
+        entry.write_text(json.dumps(legacy))
+        self.assertEqual(verify_package.verify(archive, entry), legacy)
 
     def test_missing_notices_fail_before_creating_output(self):
         target = package.TARGETS[0]

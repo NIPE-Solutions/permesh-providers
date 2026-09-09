@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 #![allow(clippy::unwrap_used)]
 use super::*;
-use permesh_core::{Certainty, Privilege};
+use permesh_core::{Affiliation, Certainty, EvidenceKind, IdentityKind, IdentityStatus, Privilege};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 const ACCOUNT: &str = "123456789012";
 const USER: &str = "AIDAEXAMPLEUSER1234567";
@@ -122,6 +122,21 @@ async fn signed_readonly_calls_preserve_attachment_evidence_without_effective_pr
     assert_eq!(snapshot.accounts.len(), 1);
     assert!(snapshot.identities.is_empty());
     assert!(snapshot.accounts[0].verified_emails.is_empty());
+    assert_eq!(snapshot.accounts[0].kind, IdentityKind::Unknown);
+    assert_eq!(snapshot.accounts[0].status, IdentityStatus::Unknown);
+    assert_eq!(snapshot.accounts[0].affiliation, Affiliation::Unknown);
+    assert_eq!(snapshot.resources.len(), 2);
+    for resource in &snapshot.resources {
+        assert!(resource.parent.is_none());
+        assert_eq!(
+            resource.kind.as_deref(),
+            Some(if resource.key.id.starts_with("inline:") {
+                "aws.inline_policy"
+            } else {
+                "aws.managed_policy"
+            })
+        );
+    }
     assert_eq!(snapshot.groups.len(), 1);
     assert_eq!(snapshot.memberships.len(), 1);
     assert_eq!(snapshot.grants.len(), 3);
@@ -129,7 +144,9 @@ async fn signed_readonly_calls_preserve_attachment_evidence_without_effective_pr
         snapshot
             .grants
             .iter()
-            .all(|g| g.privilege == Privilege::Unknown && g.certainty == Certainty::Observed)
+            .all(|g| g.privilege == Privilege::Unknown
+                && g.certainty == Certainty::Observed
+                && g.evidence_kind == EvidenceKind::PolicyAttachment)
     );
     assert!(
         !serde_json::to_string(&snapshot)
@@ -326,7 +343,14 @@ async fn roles_are_native_unknown_principals_without_assumption_edges() {
     let s = p.discover().await.unwrap();
     assert!(s.complete);
     assert_eq!(s.accounts.len(), 1);
-    assert_eq!(s.accounts[0].kind, permesh_core::IdentityKind::Unknown);
+    assert_eq!(s.accounts[0].kind, IdentityKind::Unknown);
+    assert_eq!(s.accounts[0].status, IdentityStatus::Unknown);
+    assert_eq!(s.accounts[0].affiliation, Affiliation::Unknown);
+    assert!(
+        s.grants
+            .iter()
+            .all(|g| g.evidence_kind == EvidenceKind::PolicyAttachment)
+    );
     assert!(s.memberships.is_empty());
     assert_eq!(s.grants.len(), 1);
     assert!(!serde_json::to_string(&s).unwrap().contains("sentinel"));
@@ -402,4 +426,80 @@ async fn policy_arn_name_disagreement_cannot_create_attachment_evidence() {
     assert!(s.resources.is_empty());
     assert!(s.grants.is_empty());
     t.abort();
+}
+
+#[tokio::test]
+async fn shared_runtime_cross_decodes_policy_attachments_and_resource_kinds() {
+    use permesh_provider_protocol::negotiated::DiscoveryDecoder;
+    let (provider, server) = mock(|_, body| {
+        (
+            200,
+            String::new(),
+            if body.contains("GetCallerIdentity") {
+                identity(ACCOUNT)
+            } else {
+                page(
+                    &user(USER, ACCOUNT, "alice"),
+                    &group(),
+                    &policy(),
+                    "<IsTruncated>false</IsTruncated>",
+                )
+            },
+        )
+    })
+    .await;
+    let (mut host, peer) = tokio::io::duplex(128 * 1024);
+    let (reader, writer) = tokio::io::split(peer);
+    let task = tokio::spawn(async move {
+        permesh_native_runtime::serve::<crate::protocol::Aws, _, _, _, _, _>(
+            reader,
+            writer,
+            move |_, _, _| async move { Ok(provider) },
+        )
+        .await
+    });
+    let request = format!(
+        "{}\n{}\n",
+        serde_json::json!({"protocol_version":1,"id":"handshake","method":"handshake","instance":"aws-main","operation":"discover"}),
+        serde_json::json!({"protocol_version":1,"id":"discover","method":"discover","configuration":{"account_id":ACCOUNT,"region":"eu-west-1"},"credentials":{"access_key_id":"AKIATEST1234567890123","secret_access_key":"SENTINEL"}})
+    );
+    host.write_all(request.as_bytes()).await.unwrap();
+    let mut output = Vec::new();
+    host.read_to_end(&mut output).await.unwrap();
+    assert!(task.await.unwrap().is_ok());
+    let mut decoder =
+        DiscoveryDecoder::new("aws", "aws-main", Some(&provider_metadata().capabilities)).unwrap();
+    for frame in output.split_inclusive(|b| *b == b'\n') {
+        decoder.push_frame(frame).unwrap();
+    }
+    let snapshot = decoder.finish().unwrap();
+    snapshot.validate().unwrap();
+    assert!(snapshot.complete);
+    assert_eq!(snapshot.accounts.len(), 1);
+    assert_eq!(snapshot.accounts[0].status, IdentityStatus::Unknown);
+    assert_eq!(snapshot.accounts[0].affiliation, Affiliation::Unknown);
+    assert_eq!(snapshot.grants.len(), 3);
+    assert!(
+        snapshot
+            .grants
+            .iter()
+            .all(|g| g.evidence_kind == EvidenceKind::PolicyAttachment
+                && g.certainty == Certainty::Observed
+                && g.privilege == Privilege::Unknown)
+    );
+    assert_eq!(snapshot.resources.len(), 2);
+    assert!(snapshot.resources.iter().all(|r| r.parent.is_none()));
+    assert!(
+        snapshot
+            .resources
+            .iter()
+            .any(|r| r.kind.as_deref() == Some("aws.managed_policy"))
+    );
+    assert!(
+        snapshot
+            .resources
+            .iter()
+            .any(|r| r.kind.as_deref() == Some("aws.inline_policy"))
+    );
+    server.abort();
 }

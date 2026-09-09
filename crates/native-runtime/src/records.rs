@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
-//! Explicit outbound projection onto the frozen discovery wire schema.
-//! Domain additions stay internal until a new wire contract is negotiated.
+//! Explicit outbound projection onto the independent negotiated-v1 DTOs.
 use permesh_core as domain;
-use permesh_provider_protocol::records as wire;
+use permesh_provider_protocol::negotiated::records as wire;
 use permesh_provider_sdk as sdk;
 
 pub(super) fn capability(value: sdk::Capability) -> wire::Capability {
@@ -18,7 +17,6 @@ pub(super) fn capability(value: sdk::Capability) -> wire::Capability {
 fn identity_kind(value: domain::IdentityKind) -> wire::IdentityKind {
     match value {
         domain::IdentityKind::Human => wire::IdentityKind::Human,
-        domain::IdentityKind::External => wire::IdentityKind::External,
         domain::IdentityKind::Service => wire::IdentityKind::Service,
         domain::IdentityKind::Bot => wire::IdentityKind::Bot,
         domain::IdentityKind::Unknown => wire::IdentityKind::Unknown,
@@ -28,9 +26,23 @@ fn identity_status(value: domain::IdentityStatus) -> wire::IdentityStatus {
     match value {
         domain::IdentityStatus::Active => wire::IdentityStatus::Active,
         domain::IdentityStatus::Inactive => wire::IdentityStatus::Inactive,
-        domain::IdentityStatus::External => wire::IdentityStatus::External,
-        domain::IdentityStatus::Service => wire::IdentityStatus::Service,
+        domain::IdentityStatus::Suspended => wire::IdentityStatus::Suspended,
         domain::IdentityStatus::Unknown => wire::IdentityStatus::Unknown,
+    }
+}
+fn affiliation(value: domain::Affiliation) -> wire::Affiliation {
+    match value {
+        domain::Affiliation::Internal => wire::Affiliation::Internal,
+        domain::Affiliation::External => wire::Affiliation::External,
+        domain::Affiliation::Unknown => wire::Affiliation::Unknown,
+    }
+}
+fn evidence_kind(value: domain::EvidenceKind) -> wire::EvidenceKind {
+    match value {
+        domain::EvidenceKind::Permission => wire::EvidenceKind::Permission,
+        domain::EvidenceKind::Assignment => wire::EvidenceKind::Assignment,
+        domain::EvidenceKind::PolicyAttachment => wire::EvidenceKind::PolicyAttachment,
+        domain::EvidenceKind::Unknown => wire::EvidenceKind::Unknown,
     }
 }
 fn privilege(value: domain::Privilege) -> wire::Privilege {
@@ -45,6 +57,7 @@ fn privilege(value: domain::Privilege) -> wire::Privilege {
 fn certainty(value: domain::Certainty) -> wire::Certainty {
     match value {
         domain::Certainty::Observed => wire::Certainty::Observed,
+        domain::Certainty::Derived => wire::Certainty::Derived,
         domain::Certainty::Inferred => wire::Certainty::Inferred,
         domain::Certainty::Unknown => wire::Certainty::Unknown,
     }
@@ -71,7 +84,9 @@ pub(super) fn account(value: &domain::Account) -> wire::Record {
     wire::Record::Account(wire::Account {
         key: key(&value.key),
         login: value.login.clone(),
+        status: identity_status(value.status),
         kind: identity_kind(value.kind),
+        affiliation: affiliation(value.affiliation),
         verified_emails: value.verified_emails.clone(),
     })
 }
@@ -79,6 +94,7 @@ pub(super) fn identity(value: &domain::Identity) -> wire::Record {
     wire::Record::Identity(wire::Identity {
         id: value.id.clone(),
         kind: identity_kind(value.kind),
+        affiliation: affiliation(value.affiliation),
         status: identity_status(value.status),
         verified_emails: value.verified_emails.clone(),
     })
@@ -87,6 +103,8 @@ pub(super) fn resource(value: &domain::Resource) -> wire::Record {
     wire::Record::Resource(wire::Resource {
         key: key(&value.key),
         name: value.name.clone(),
+        kind: value.kind.clone(),
+        parent: value.parent.as_ref().map(key),
     })
 }
 pub(super) fn group(value: &domain::Group) -> wire::Record {
@@ -110,6 +128,7 @@ pub(super) fn grant(value: &domain::Grant) -> wire::Record {
         role: value.role.clone(),
         privilege: privilege(value.privilege),
         certainty: certainty(value.certainty),
+        evidence_kind: evidence_kind(value.evidence_kind),
         provenance: provenance(&value.provenance),
     })
 }
@@ -118,19 +137,17 @@ pub(super) fn grant(value: &domain::Grant) -> wire::Record {
 mod tests {
     use super::*;
     #[test]
-    fn domain_enum_values_keep_their_frozen_wire_meanings() -> Result<(), serde_json::Error> {
+    fn domain_enum_values_keep_their_negotiated_wire_meanings() -> Result<(), serde_json::Error> {
         use domain::{Certainty as C, IdentityKind as K, IdentityStatus as S, Privilege as P};
         assert_eq!(
-            serde_json::to_value(
-                [K::Human, K::External, K::Service, K::Bot, K::Unknown].map(identity_kind)
-            )?,
-            serde_json::json!(["human", "external", "service", "bot", "unknown"])
+            serde_json::to_value([K::Human, K::Service, K::Bot, K::Unknown].map(identity_kind))?,
+            serde_json::json!(["human", "service", "bot", "unknown"])
         );
         assert_eq!(
             serde_json::to_value(
-                [S::Active, S::Inactive, S::External, S::Service, S::Unknown].map(identity_status)
+                [S::Active, S::Inactive, S::Suspended, S::Unknown].map(identity_status)
             )?,
-            serde_json::json!(["active", "inactive", "external", "service", "unknown"])
+            serde_json::json!(["active", "inactive", "suspended", "unknown"])
         );
         assert_eq!(
             serde_json::to_value(
@@ -139,8 +156,33 @@ mod tests {
             serde_json::json!(["standard", "elevated", "admin", "owner", "unknown"])
         );
         assert_eq!(
-            serde_json::to_value([C::Observed, C::Inferred, C::Unknown].map(certainty))?,
-            serde_json::json!(["observed", "inferred", "unknown"])
+            serde_json::to_value(
+                [C::Observed, C::Derived, C::Inferred, C::Unknown].map(certainty)
+            )?,
+            serde_json::json!(["observed", "derived", "inferred", "unknown"])
+        );
+        assert_eq!(
+            serde_json::to_value(
+                [
+                    domain::Affiliation::Internal,
+                    domain::Affiliation::External,
+                    domain::Affiliation::Unknown
+                ]
+                .map(affiliation)
+            )?,
+            serde_json::json!(["internal", "external", "unknown"])
+        );
+        assert_eq!(
+            serde_json::to_value(
+                [
+                    domain::EvidenceKind::Permission,
+                    domain::EvidenceKind::Assignment,
+                    domain::EvidenceKind::PolicyAttachment,
+                    domain::EvidenceKind::Unknown
+                ]
+                .map(evidence_kind)
+            )?,
+            serde_json::json!(["permission", "assignment", "policy_attachment", "unknown"])
         );
         Ok(())
     }

@@ -117,3 +117,5 @@ account mismatch, conflicts, unresolved references, pagination, partial denial,
 credential reflection, redirects, response limits, bounded throttling, dropped
 requests, native setup and queued cancellation. Live credential validation,
 five-platform artifacts and release qualification remain publication gates.
+
+Current 0.2.0 source candidates require [explicit negotiated-v1 adoption](negotiated-v1.md).

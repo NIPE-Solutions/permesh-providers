@@ -45,7 +45,7 @@ that grant claim; observations from distinct methods remain distinct. A later
 repeat of the original value does not restore an excluded claim. This can omit
 legitimate access during concurrent upstream edits, so conflicts always mark the
 snapshot incomplete. Stable native keys do not change, and a clean subsequent
-collection can observe the entity again. Native draft 2 reports the conflict
+collection can observe the entity again. Native discovery reports the conflict
 through its existing generic limitation category rather than exposing raw rows.
 
 
@@ -71,11 +71,12 @@ Run `cargo test -p permesh-provider-github`. Mock HTTP tests cover normalized sn
 
 The API adapter and its HTTP contract tests were moved from Permesh revision
 `0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c`, retaining their original license notices.
-Core, SDK, protocol and secret types use that exact public revision. The main
-repository's later MIT decision does not alter these earlier source terms.
+Current SDK pins and historical source provenance are documented in the
+[dependency policy](dependencies.md). Third-party license obligations remain
+separate from this repository's MIT license.
 
 The executable identifies as `github`, declares accounts, resources, groups,
-memberships and grants, and supports draft 2 configured health/discovery and
+memberships and grants, and supports negotiated v1 configured health/discovery and
 draft 3 declarative setup. It does not declare authoritative identities. Provider
 stdout carries only bounded NDJSON; fixed error categories and limitation codes
 avoid copying provider responses or credentials into diagnostics.
@@ -88,3 +89,5 @@ GitHub. Use a dedicated, short-lived token where supported. Classic `repo` scope
 is broader than read-only; prefer a fine-grained token with the read permissions
 above. The adapter itself only issues GET requests and never requests repository
 contents, messages or documents.
+
+Current source candidates require [explicit negotiated-v1 adoption](negotiated-v1.md).

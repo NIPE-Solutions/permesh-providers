@@ -8,7 +8,7 @@ mod response;
 use io::{Input, Output};
 use permesh_provider_sdk::ProviderError;
 use permesh_provider_sdk::{Metadata, Provider, browser_auth::BrowserAuthSpec, setup::SetupSpec};
-use request::Command;
+use request::{Command, Operation, RequestContract};
 use serde::de::DeserializeOwned;
 use std::future::Future;
 use std::time::Duration;
@@ -101,8 +101,12 @@ where
     P: Provider,
 {
     let request = next::<A, _>(input).await?;
-    output.version = request.protocol;
-    let Command::Handshake { instance } = request.command else {
+    output.contract = request.contract;
+    let Command::Handshake {
+        instance,
+        operation,
+    } = request.command
+    else {
         return Err(Failure::Protocol);
     };
     let metadata = A::metadata();
@@ -111,9 +115,13 @@ where
         .into_iter()
         .map(records::capability)
         .collect();
-    output.send(&serde_json::json!({"event":"handshake","provider":metadata.kind,"capabilities":capabilities,"draft":true})).await?;
+    if output.contract == RequestContract::NegotiatedV1 {
+        output.send(&serde_json::json!({"event":"handshake","provider":metadata.kind,"capabilities":capabilities,"operations":["discover","check"],"draft":true})).await?;
+    } else {
+        output.send(&serde_json::json!({"event":"handshake","provider":metadata.kind,"capabilities":capabilities,"draft":true})).await?;
+    }
     let request = next::<A, _>(input).await?;
-    if request.protocol != output.version {
+    if request.contract != output.contract {
         return Err(Failure::Protocol);
     }
     match request.command {
@@ -140,18 +148,27 @@ where
             credentials,
         } => {
             output.id = if check { "check" } else { "discover" };
-            let version = output.version;
+            if operation
+                != Some(if check {
+                    Operation::Check
+                } else {
+                    Operation::Discover
+                })
+            {
+                return Err(Failure::Protocol);
+            }
+            let contract = output.contract;
             // Read cancellation concurrently, with no task that can outlive this session.
             tokio::select! {
                 biased;
                 frame=input.frame()=>{
                     let frame=frame?;
                     let request=request::parse::<A>(&frame).map_err(|_|Failure::Protocol)?;
-                    if request.protocol==version && matches!(request.command,Command::Cancel) {Err(Failure::Cancelled)} else {Err(Failure::Protocol)}
+                    if request.contract==contract && matches!(request.command,Command::Cancel) {Err(Failure::Cancelled)} else {Err(Failure::Protocol)}
                 },
                 result=tokio::time::timeout(Duration::from_secs(55),async {
-                    let provider = factory(instance, configuration, credentials).await.map_err(|e| Failure::Provider(A::error_code(&e.code)))?;
-                    response::operation::<A, _, _>(&provider,check,output).await
+                    let provider = factory(instance.clone(), configuration, credentials).await.map_err(|e| Failure::Provider(A::error_code(&e.code)))?;
+                    response::operation::<A, _, _>(&provider,check,&instance,output).await
                 })=>result.map_err(|_|Failure::Unavailable)?,
             }
         }

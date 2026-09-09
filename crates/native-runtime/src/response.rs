@@ -9,12 +9,12 @@ use tokio::io::AsyncWrite;
 struct Record {
     event: &'static str,
     #[serde(flatten)]
-    record: permesh_provider_protocol::records::Record,
+    record: permesh_provider_protocol::negotiated::records::Record,
 }
 async fn records<W: AsyncWrite + Unpin, T>(
     out: &mut Output<W>,
     values: &[T],
-    convert: fn(&T) -> permesh_provider_protocol::records::Record,
+    convert: fn(&T) -> permesh_provider_protocol::negotiated::records::Record,
 ) -> Result<(), Failure> {
     for data in values {
         out.send(&Record {
@@ -28,6 +28,7 @@ async fn records<W: AsyncWrite + Unpin, T>(
 pub(super) async fn operation<A: Adapter, P: Provider, W: AsyncWrite + Unpin>(
     provider: &P,
     check: bool,
+    instance: &str,
     out: &mut Output<W>,
 ) -> Result<(), Failure> {
     if check {
@@ -37,10 +38,15 @@ pub(super) async fn operation<A: Adapter, P: Provider, W: AsyncWrite + Unpin>(
             .map_err(|e| Failure::Provider(A::error_code(&e.code)))?;
         out.send(&serde_json::json!({"event":"health","status":"ok","limitations":A::limitations(&health.limitations)})).await
     } else {
-        let snapshot = provider
+        let mut snapshot = provider
             .discover()
             .await
             .map_err(|e| Failure::Provider(A::error_code(&e.code)))?;
+        if snapshot.provider != instance {
+            return Err(Failure::Internal);
+        }
+        snapshot.validate().map_err(|_| Failure::Internal)?;
+        snapshot.sort();
         let count = snapshot.identities.len()
             + snapshot.accounts.len()
             + snapshot.resources.len()

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 #![allow(clippy::unwrap_used)]
 use super::*;
-use permesh_provider_protocol::{DiscoveryDecoder, HealthDecoder};
+use permesh_provider_protocol::negotiated::{DiscoveryDecoder, HealthDecoder};
 use permesh_provider_sdk::Provider;
 use serde_json::{Value, json};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -52,7 +52,7 @@ async fn exchange(origin: &str, check: bool) -> (Result<(), ProtocolFailure>, Ve
     });
     let method = if check { "check" } else { "discover" };
     let request = format!(
-        "{{\"protocol\":2,\"id\":\"handshake\",\"method\":\"handshake\",\"instance\":\"github-main\"}}\n{{\"protocol\":2,\"id\":\"{method}\",\"method\":\"{method}\",\"configuration\":{{\"organizations\":[\"acme\"]}},\"credentials\":{{\"token\":\"SENTINEL-secret\"}}}}\n"
+        "{{\"protocol_version\":1,\"id\":\"handshake\",\"method\":\"handshake\",\"operation\":\"{method}\",\"instance\":\"github-main\"}}\n{{\"protocol_version\":1,\"id\":\"{method}\",\"method\":\"{method}\",\"configuration\":{{\"organizations\":[\"acme\"]}},\"credentials\":{{\"token\":\"SENTINEL-secret\"}}}}\n"
     );
     host.write_all(request.as_bytes()).await.unwrap();
     let mut response = Vec::new();
@@ -117,11 +117,10 @@ async fn wrapped_discovery_preserves_success_partial_and_pagination_observations
         let (status, response) = exchange(&origin, false).await;
         assert!(status.is_ok());
         assert!(!String::from_utf8_lossy(&response).contains("SENTINEL-secret"));
-        let mut decoder = DiscoveryDecoder::new_versioned(
+        let mut decoder = DiscoveryDecoder::new(
             "github",
             "github-main",
             Some(&crate::provider_metadata().capabilities),
-            2,
         )
         .unwrap();
         for frame in response.split_inclusive(|b| *b == b'\n') {
@@ -197,11 +196,11 @@ async fn cancellation_drops_an_in_flight_http_request() {
         tokio::spawn(
             async move { serve(reader, writer, move |_, _, _| Ok(provider(&origin))).await },
         );
-    host.write_all(b"{\"protocol\":2,\"id\":\"handshake\",\"method\":\"handshake\",\"instance\":\"github-main\"}\n{\"protocol\":2,\"id\":\"check\",\"method\":\"check\",\"configuration\":{\"organizations\":[\"acme\"]},\"credentials\":{\"token\":\"SENTINEL-secret\"}}\n").await.unwrap();
+    host.write_all(b"{\"protocol_version\":1,\"id\":\"handshake\",\"method\":\"handshake\",\"operation\":\"check\",\"instance\":\"github-main\"}\n{\"protocol_version\":1,\"id\":\"check\",\"method\":\"check\",\"configuration\":{\"organizations\":[\"acme\"]},\"credentials\":{\"token\":\"SENTINEL-secret\"}}\n").await.unwrap();
     let (mut socket, _) = listener.accept().await.unwrap();
     let mut request = [0; 8192];
     assert!(socket.read(&mut request).await.unwrap() > 0);
-    host.write_all(b"{\"protocol\":2,\"id\":\"cancel\",\"method\":\"cancel\"}\n")
+    host.write_all(b"{\"protocol_version\":1,\"id\":\"cancel\",\"method\":\"cancel\"}\n")
         .await
         .unwrap();
     let mut response = String::new();
@@ -295,11 +294,10 @@ async fn conflicting_paginated_observations_never_escape_the_native_contract() {
         }).await;
         let (result, output) = exchange(&origin, false).await;
         assert!(result.is_ok(), "{conflict}");
-        let mut decoder = DiscoveryDecoder::new_versioned(
+        let mut decoder = DiscoveryDecoder::new(
             "github",
             "github-main",
             Some(&crate::provider_metadata().capabilities),
-            2,
         )
         .unwrap();
         for frame in output.split_inclusive(|b| *b == b'\n') {

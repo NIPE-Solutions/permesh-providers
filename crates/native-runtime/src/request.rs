@@ -8,7 +8,12 @@ use serde::{Deserialize, Deserializer};
     deserialize = "A::Configuration: Deserialize<'de>, A::Credentials: Deserialize<'de>"
 ))]
 struct WireRequest<A: Adapter> {
-    protocol: u32,
+    #[serde(default, deserialize_with = "present")]
+    protocol: Option<u32>,
+    #[serde(default, deserialize_with = "present")]
+    protocol_version: Option<u32>,
+    #[serde(default, deserialize_with = "present")]
+    operation: Option<Operation>,
     id: String,
     method: String,
     #[serde(default, deserialize_with = "present")]
@@ -19,15 +24,30 @@ struct WireRequest<A: Adapter> {
     credentials: Option<A::Credentials>,
 }
 fn present<'de, D: Deserializer<'de>, T: Deserialize<'de>>(d: D) -> Result<Option<T>, D::Error> {
-    T::deserialize(d).map(Some)
+    Option::<T>::deserialize(d)?
+        .map(Some)
+        .ok_or_else(|| serde::de::Error::custom("null field"))
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum RequestContract {
+    NegotiatedV1,
+    LegacySetup,
+    LegacyAuth,
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub(super) enum Operation {
+    Check,
+    Discover,
 }
 pub(super) struct Request<A: Adapter> {
-    pub protocol: u32,
+    pub contract: RequestContract,
     pub command: Command<A>,
 }
 pub(super) enum Command<A: Adapter> {
     Handshake {
         instance: String,
+        operation: Option<Operation>,
     },
     Operation {
         check: bool,
@@ -50,7 +70,16 @@ pub(super) fn parse<A: Adapter>(bytes: &[u8]) -> Result<Request<A>, ()> {
         return Err(());
     }
     let value: WireRequest<A> = serde_json::from_slice(bytes).map_err(|_| ())?;
-    if !matches!(value.protocol, 2..=4) || value.id != value.method {
+    let contract = match (value.protocol, value.protocol_version) {
+        (None, Some(1)) => RequestContract::NegotiatedV1,
+        (Some(3), None) => RequestContract::LegacySetup,
+        (Some(4), None) => RequestContract::LegacyAuth,
+        _ => return Err(()),
+    };
+    if value.id != value.method {
+        return Err(());
+    }
+    if value.method != "handshake" && value.operation.is_some() {
         return Err(());
     }
     let command = match value.method.as_str() {
@@ -59,10 +88,16 @@ pub(super) fn parse<A: Adapter>(bytes: &[u8]) -> Result<Request<A>, ()> {
             if !valid_instance(&instance) {
                 return Err(());
             }
-            Command::Handshake { instance }
+            if (contract == RequestContract::NegotiatedV1) != value.operation.is_some() {
+                return Err(());
+            }
+            Command::Handshake {
+                instance,
+                operation: value.operation,
+            }
         }
         "describe"
-            if value.protocol == 3
+            if contract == RequestContract::LegacySetup
                 && value.instance.is_none()
                 && value.configuration.is_none()
                 && value.credentials.is_none() =>
@@ -70,7 +105,7 @@ pub(super) fn parse<A: Adapter>(bytes: &[u8]) -> Result<Request<A>, ()> {
             Command::Describe
         }
         "describe_auth"
-            if value.protocol == 4
+            if contract == RequestContract::LegacyAuth
                 && value.instance.is_none()
                 && value.configuration.is_none()
                 && value.credentials.is_none() =>
@@ -84,7 +119,9 @@ pub(super) fn parse<A: Adapter>(bytes: &[u8]) -> Result<Request<A>, ()> {
         {
             Command::Cancel
         }
-        "check" | "discover" if value.protocol == 2 && value.instance.is_none() => {
+        "check" | "discover"
+            if contract == RequestContract::NegotiatedV1 && value.instance.is_none() =>
+        {
             let configuration = value.configuration.ok_or(())?;
             let credentials = value.credentials.ok_or(())?;
             if !A::validate(&configuration, &credentials) {
@@ -98,8 +135,5 @@ pub(super) fn parse<A: Adapter>(bytes: &[u8]) -> Result<Request<A>, ()> {
         }
         _ => return Err(()),
     };
-    Ok(Request {
-        protocol: value.protocol,
-        command,
-    })
+    Ok(Request { contract, command })
 }

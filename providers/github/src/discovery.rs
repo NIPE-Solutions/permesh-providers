@@ -34,6 +34,8 @@ impl GithubProvider {
                 Resource {
                     key: org_key.clone(),
                     name: org.clone(),
+                    kind: Some("github.organization".into()),
+                    parent: None,
                 },
             );
             state.groups.insert(
@@ -73,6 +75,11 @@ impl GithubProvider {
             let mut repositories = BTreeMap::new();
             for repo in state.accept("organization repositories", list) {
                 if let Some((key, owner, name)) = state.repository(&repo) {
+                    if owner.eq_ignore_ascii_case(org)
+                        && let Some(resource) = state.resources.get_mut(&key)
+                    {
+                        resource.parent = Some(org_key.clone());
+                    }
                     repositories.insert(key, (owner, name));
                 }
             }
@@ -102,6 +109,11 @@ impl GithubProvider {
                     .await;
                 for repo in state.accept("team repositories", list) {
                     if let Some((resource, owner, name)) = state.repository(&repo) {
+                        if owner.eq_ignore_ascii_case(org)
+                            && let Some(resource) = state.resources.get_mut(&resource)
+                        {
+                            resource.parent = Some(org_key.clone());
+                        }
                         let permissions = match self
                             .url(&["orgs", org, "teams", &slug, "repos", &owner, &name], &[])
                         {

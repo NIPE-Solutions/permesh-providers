@@ -124,3 +124,5 @@ failures, redirects, throttling, response limits, deadlines and cancellation.
 Native subprocess tests validate setup, credential boundaries and cancellation.
 Live validation and five-target release qualification remain required before
 publishing an installable catalog entry.
+
+Current 0.2.0 source candidates require [explicit negotiated-v1 adoption](negotiated-v1.md).

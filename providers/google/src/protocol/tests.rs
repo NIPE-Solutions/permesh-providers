@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 #![allow(clippy::unwrap_used)]
 use super::*;
-use permesh_provider_protocol::{DiscoveryDecoder, HealthDecoder};
+use permesh_provider_protocol::negotiated::{DiscoveryDecoder, HealthDecoder};
 use permesh_provider_sdk::Provider;
 use serde_json::{Value, json};
 use std::time::Duration;
@@ -44,8 +44,8 @@ async fn serve_mock<R: AsyncRead + Unpin, W: AsyncWrite + Unpin>(
 fn input(method: &str) -> String {
     format!(
         "{}\n{}\n",
-        json!({"protocol":2,"id":"handshake","method":"handshake","instance":"directory"}),
-        json!({"protocol":2,"id":method,"method":method,"configuration":{"customer_id":"C123"},"credentials":{"token":"SENTINEL-secret"}})
+        json!({"protocol_version":1,"id":"handshake","method":"handshake","operation":method,"instance":"directory"}),
+        json!({"protocol_version":1,"id":method,"method":method,"configuration":{"customer_id":"C123"},"credentials":{"token":"SENTINEL-secret"}})
     )
 }
 async fn exchange(endpoint: String, method: &str) -> (Result<(), ProtocolFailure>, Vec<u8>) {
@@ -85,11 +85,10 @@ async fn discovery_wire_preserves_native_accounts_identities_status_and_partial_
         let (result, output) = exchange(endpoint, "discover").await;
         assert!(result.is_ok());
         assert!(!String::from_utf8_lossy(&output).contains("SENTINEL-secret"));
-        let mut decoder = DiscoveryDecoder::new_versioned(
+        let mut decoder = DiscoveryDecoder::new(
             "google",
             "directory",
             Some(&crate::provider_metadata().capabilities),
-            2,
         )
         .unwrap();
         for frame in output.split_inclusive(|b| *b == b'\n') {
@@ -140,7 +139,7 @@ async fn cancellation_drops_directory_request_and_does_not_echo_credentials() {
     let (mut socket, _) = listener.accept().await.unwrap();
     let mut buf = [0; 8192];
     assert!(socket.read(&mut buf).await.unwrap() > 0);
-    host.write_all(b"{\"protocol\":2,\"id\":\"cancel\",\"method\":\"cancel\"}\n")
+    host.write_all(b"{\"protocol_version\":1,\"id\":\"cancel\",\"method\":\"cancel\"}\n")
         .await
         .unwrap();
     let mut output = String::new();
@@ -158,7 +157,7 @@ async fn cancellation_drops_directory_request_and_does_not_echo_credentials() {
 }
 #[test]
 fn schemas_require_exact_auth_credentials_and_reject_overrides_duplicates_and_null() {
-    let valid = json!({"protocol":2,"id":"check","method":"check","configuration":{"customer_id":"C123","auth_mode":"refresh_token","client_id":"desktop.apps.googleusercontent.com"},"credentials":{"refresh_token":"refresh","client_secret":"secret"}});
+    let valid = json!({"protocol_version":1,"id":"check","method":"check","configuration":{"customer_id":"C123","auth_mode":"refresh_token","client_id":"desktop.apps.googleusercontent.com"},"credentials":{"refresh_token":"refresh","client_secret":"secret"}});
     assert!(
         permesh_native_runtime::validate_request::<Google>(valid.to_string().as_bytes()).is_ok()
     );

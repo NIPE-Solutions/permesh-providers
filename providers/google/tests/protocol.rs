@@ -50,7 +50,7 @@ async fn real_binary_describe_cross_decodes_without_credentials_or_network() {
 }
 #[tokio::test]
 async fn real_binary_rejects_malformed_and_unknown_fields_without_echo() {
-    for input in [&b"{bad SECRET}\n"[..], &b"{\"protocol\":2,\"id\":\"handshake\",\"method\":\"handshake\",\"instance\":\"google-main\",\"secret\":\"SECRET\"}\n"[..]] {
+    for input in [&b"{bad SECRET}\n"[..], &b"{\"protocol_version\":1,\"id\":\"handshake\",\"method\":\"handshake\",\"operation\":\"discover\",\"instance\":\"google-main\",\"secret\":\"SECRET\"}\n"[..]] {
         let result=process(input).await; assert!(!result.status.success());
         assert!(!String::from_utf8_lossy(&result.stdout).contains("SECRET"));
         assert!(!String::from_utf8_lossy(&result.stderr).contains("SECRET"));
@@ -59,7 +59,7 @@ async fn real_binary_rejects_malformed_and_unknown_fields_without_echo() {
 }
 #[tokio::test]
 async fn real_binary_cancels_before_network_when_cancel_is_queued() {
-    let input=b"{\"protocol\":2,\"id\":\"handshake\",\"method\":\"handshake\",\"instance\":\"google-main\"}\n{\"protocol\":2,\"id\":\"discover\",\"method\":\"discover\",\"configuration\":{\"customer_id\":\"C123\"},\"credentials\":{\"token\":\"SECRET\"}}\n{\"protocol\":2,\"id\":\"cancel\",\"method\":\"cancel\"}\n";
+    let input=b"{\"protocol_version\":1,\"id\":\"handshake\",\"method\":\"handshake\",\"operation\":\"discover\",\"instance\":\"google-main\"}\n{\"protocol_version\":1,\"id\":\"discover\",\"method\":\"discover\",\"configuration\":{\"customer_id\":\"C123\"},\"credentials\":{\"token\":\"SECRET\"}}\n{\"protocol_version\":1,\"id\":\"cancel\",\"method\":\"cancel\"}\n";
     let result = process(input).await;
     assert!(String::from_utf8_lossy(&result.stdout).contains("cancelled"));
     assert!(!String::from_utf8_lossy(&result.stdout).contains("SECRET"));
@@ -104,7 +104,7 @@ async fn real_binary_request_deadline_exits_with_stdin_kept_open() {
 
 #[tokio::test]
 async fn real_binary_cancels_refresh_before_token_exchange_and_keeps_secrets_off_output() {
-    let input=b"{\"protocol\":2,\"id\":\"handshake\",\"method\":\"handshake\",\"instance\":\"directory\"}\n{\"protocol\":2,\"id\":\"discover\",\"method\":\"discover\",\"configuration\":{\"customer_id\":\"C123\",\"auth_mode\":\"refresh_token\",\"client_id\":\"desktop.apps.googleusercontent.com\"},\"credentials\":{\"refresh_token\":\"REFRESH-SENTINEL\",\"client_secret\":\"CLIENT-SENTINEL\"}}\n{\"protocol\":2,\"id\":\"cancel\",\"method\":\"cancel\"}\n";
+    let input=b"{\"protocol_version\":1,\"id\":\"handshake\",\"method\":\"handshake\",\"operation\":\"discover\",\"instance\":\"directory\"}\n{\"protocol_version\":1,\"id\":\"discover\",\"method\":\"discover\",\"configuration\":{\"customer_id\":\"C123\",\"auth_mode\":\"refresh_token\",\"client_id\":\"desktop.apps.googleusercontent.com\"},\"credentials\":{\"refresh_token\":\"REFRESH-SENTINEL\",\"client_secret\":\"CLIENT-SENTINEL\"}}\n{\"protocol_version\":1,\"id\":\"cancel\",\"method\":\"cancel\"}\n";
     let result = process(input).await;
     assert!(result.status.success());
     assert!(result.stderr.is_empty());
@@ -180,4 +180,16 @@ async fn browser_description_rejects_credentials_and_does_not_enable_draft4_disc
         assert!(!String::from_utf8_lossy(&result.stdout).contains("NEVER-ECHO"));
         assert!(!String::from_utf8_lossy(&result.stderr).contains("NEVER-ECHO"));
     }
+}
+
+#[tokio::test]
+async fn real_binary_rejects_draft2_discovery_handshake() {
+    let result = process(
+        b"{\"protocol\":2,\"id\":\"handshake\",\"method\":\"handshake\",\"instance\":\"legacy\"}\n",
+    )
+    .await;
+    assert!(!result.status.success());
+    let output = String::from_utf8(result.stdout).unwrap();
+    assert!(output.contains("protocol_error"));
+    assert!(!output.contains("capabilities"));
 }

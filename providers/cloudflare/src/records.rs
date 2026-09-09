@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 use super::{client::Budget, *};
 use permesh_core::{
-    Account, Certainty, EntityKey, Grant, Group, IdentityKind, Membership, Privilege, Provenance,
-    Resource, Subject,
+    Account, Affiliation, Certainty, EntityKey, EvidenceKind, Grant, Group, IdentityKind,
+    IdentityStatus, Membership, Privilege, Provenance, Resource, Subject,
 };
 use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
@@ -88,6 +88,8 @@ impl CloudflareProvider {
         Ok(Resource {
             key: self.key(format!("account:{}", self.account_id)),
             name: string(value, "name")?.into(),
+            kind: Some("cloudflare.account".into()),
+            parent: None,
         })
     }
     pub(crate) async fn collect(&self) -> Result<Snapshot, ProviderError> {
@@ -139,6 +141,8 @@ impl CloudflareProvider {
             snapshot.resources.push(Resource {
                 key: self.key(format!("zone:{key}")),
                 name: name.into(),
+                kind: Some("cloudflare.zone".into()),
+                parent: Some(self.key(format!("account:{}", self.account_id))),
             });
         }
         let groups = self
@@ -176,6 +180,8 @@ impl CloudflareProvider {
                 key: subject.clone(),
                 login: login.into(),
                 kind: IdentityKind::Unknown,
+                affiliation: Affiliation::Unknown,
+                status: IdentityStatus::Unknown,
                 verified_emails: vec![],
             });
             match self.policies(
@@ -374,6 +380,8 @@ impl CloudflareProvider {
                     let resource = if target == "*" {
                         Resource {
                             key: self.key(format!("policy-scope:account:{}:all", self.account_id)),
+                            kind: Some("cloudflare.policy_scope".into()),
+                            parent: Some(self.key(format!("account:{}", self.account_id))),
                             name: format!(
                                 "All resources policy scope in Cloudflare account {} (assignment evidence)",
                                 self.account_id
@@ -386,6 +394,8 @@ impl CloudflareProvider {
                         Resource {
                             key: self.key(format!("zone:{zone}")),
                             name: zone.into(),
+                            kind: Some("cloudflare.zone".into()),
+                            parent: Some(self.key(format!("account:{}", self.account_id))),
                         }
                     } else {
                         return Err(error("unsupported_policy"));
@@ -420,6 +430,7 @@ impl CloudflareProvider {
                                 role: name.into(),
                                 privilege: Privilege::Unknown,
                                 certainty: Certainty::Observed,
+                                evidence_kind: EvidenceKind::Assignment,
                                 provenance: provenance.clone(),
                             },
                             resource.clone(),

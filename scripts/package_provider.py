@@ -81,7 +81,7 @@ def package(root, target, output, provider='github'):
     with archive.with_name(archive.name + '.sha256').open('x', encoding='ascii', newline='\n') as stream:
         stream.write(f'{digest}  {archive.name}\n')
     release = {'provider': provider, 'version': version, 'target': target, 'capabilities': PROVIDERS[provider],
-               'protocols': [2, 3], 'archive_sha256': digest,
+               'protocols': [3], 'discovery_protocol': 'negotiated_v1', 'archive_sha256': digest,
                'executable_sha256': hashlib.sha256(binary).hexdigest(), 'archive_size': len(archive_bytes)}
     with (output / 'catalog-entry.json').open('x', encoding='utf-8', newline='\n') as stream:
         json.dump(release, stream, indent=2, sort_keys=True)

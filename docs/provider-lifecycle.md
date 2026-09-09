@@ -59,3 +59,5 @@ provider installation is not implied by protocol language independence.
 A new provider needs a clear access-metadata use case, read-only permission model,
 synthetic contract and API tests, documented incomplete paths, credential handling
 and a qualified release. Provider count is never a license or commercial gate.
+
+Current 0.2.0 source candidates require [explicit negotiated-v1 adoption](negotiated-v1.md).
