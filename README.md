@@ -39,6 +39,14 @@ unknown effective privilege. See [AWS source](providers/aws) and
 [authentication, permissions and limits](docs/aws.md). Live qualification and
 catalog publication remain pending.
 
+## Current source compatibility
+
+The 0.2.0 source candidates are unpublished. They use negotiated protocol v1
+for discovery and health, preserving identity lifecycle, resource hierarchy and
+access evidence. They require a compatible host and explicit workspace opt-in;
+see the [upgrade guide](docs/negotiated-v1.md). The published packages and catalog
+above remain unchanged.
+
 ## Repository responsibilities
 
 - Provider source, synthetic fixtures, API contract tests and limitations.

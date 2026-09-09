@@ -10,19 +10,19 @@ use serde::Deserialize;
 use zeroize::Zeroizing;
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
-struct Configuration {
+pub(crate) struct Configuration {
     account_id: String,
     region: String,
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
-struct Credentials {
+pub(crate) struct Credentials {
     access_key_id: Zeroizing<String>,
     secret_access_key: Zeroizing<String>,
     #[serde(default)]
     session_token: Option<Zeroizing<String>>,
 }
-struct Aws;
+pub(crate) struct Aws;
 impl Adapter for Aws {
     type Configuration = Configuration;
     type Credentials = Credentials;

@@ -1,9 +1,12 @@
 # Dependencies and source provenance
 
 The first GitHub provider reuses the tested Rust adapter from Permesh revision
-`0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c`. Core, SDK, protocol and secret crates
-are pinned to that exact public Git revision until published SDK releases provide
-a stable boundary. No sibling checkout is needed to build this repository.
+`0fd9ac4f059cbd2f2f7a2d16854c758dcd66fc0c`. Current core, SDK, protocol and secret
+crates are pinned to `2c1581771b321b482655863cffa25ad5c3d12d26`, which provides
+independent negotiated v1 wire DTOs and richer domain semantics. The 0.2.0
+adoption changes these four Git pins and workspace package versions without
+updating registry dependencies. Exact revisions remain required until published
+SDK releases provide a stable boundary. No sibling checkout is needed to build this repository.
 Review SDK changes as protocol compatibility changes and commit the lockfile.
 
 The adapter retains its existing dependency choices: Tokio for bounded async I/O

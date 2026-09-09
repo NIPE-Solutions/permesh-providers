@@ -1,7 +1,8 @@
 # Google Workspace Directory provider
 
 The native `google` executable provides **accounts and identities** through
-protocol draft 2 discovery/health and draft 3 declarative setup. Source and local
+negotiated v1 discovery/health and draft 3 declarative setup. See the
+[0.2.0 adoption requirements](negotiated-v1.md). Source and local
 qualification are available; no Google package is published or cataloged yet.
 The existing GitHub 0.1.0 release assets and catalog entries are unchanged.
 
@@ -67,8 +68,10 @@ instance renames. Only `primaryEmail` is directory-attested for exact email
 correlation. Aliases and recovery addresses are excluded. Directory attestation
 does not prove mailbox ownership or employee status.
 
-Identity kind is unknown. Status is inactive if suspended or archived is true,
-active only when both fields are explicitly false, and otherwise unknown.
+Identity kind and affiliation are unknown. Archived users are inactive; otherwise
+explicitly suspended users are suspended. Status is active only when both fields
+are explicitly false, and otherwise unknown. Both identities and accounts retain
+this lifecycle observation. Malformed flags make collection incomplete.
 Mismatched customers and invalid records are excluded; duplicate native IDs
 remove all conflicting claims. Later-page errors retain earlier records and mark
 the result incomplete. Health probes at most one user, without establishing full
@@ -154,11 +157,12 @@ its implementation. Setup never resolves credentials or approves the workspace.
 
 Use `--authoritative` only when this directory is a reviewed identity source of truth. Omitting it still discovers accounts, but the CLI will not treat directory status as authoritative for orphan review. Migration preserves the original authority declaration rather than choosing one automatically.
 
-## Browser login (0.1.1 source)
+## Browser login
 
-The 0.1.1 source adds an optional draft 4 authentication description. It requires
+Source candidates support an optional draft 4 authentication description. It requires
 an updated CLI with `auth login --browser`; the 0.1.0 provider and CLI alpha.1 do
-not implement that flow. Draft 2 discovery and draft 3 setup remain unchanged.
+not implement that flow. Current 0.2.0 discovery requires negotiated v1; draft 3
+setup and draft 4 authentication retain their prior contracts.
 Catalog protocol entries describe discovery/setup compatibility; optional browser
 authentication is negotiated separately and fails closed on older executables.
 

@@ -50,7 +50,7 @@ async fn real_binary_describe_cross_decodes_without_credentials_or_network() {
 }
 #[tokio::test]
 async fn real_binary_rejects_malformed_and_unknown_fields_without_echo() {
-    for input in [&b"{bad SECRET}\n"[..], &b"{\"protocol\":2,\"id\":\"handshake\",\"method\":\"handshake\",\"instance\":\"github-main\",\"secret\":\"SECRET\"}\n"[..]] {
+    for input in [&b"{bad SECRET}\n"[..], &b"{\"protocol_version\":1,\"id\":\"handshake\",\"method\":\"handshake\",\"operation\":\"discover\",\"instance\":\"github-main\",\"secret\":\"SECRET\"}\n"[..]] {
         let result=process(input).await; assert!(!result.status.success());
         assert!(!String::from_utf8_lossy(&result.stdout).contains("SECRET"));
         assert!(!String::from_utf8_lossy(&result.stderr).contains("SECRET"));
@@ -59,7 +59,7 @@ async fn real_binary_rejects_malformed_and_unknown_fields_without_echo() {
 }
 #[tokio::test]
 async fn real_binary_cancels_before_network_when_cancel_is_queued() {
-    let input=b"{\"protocol\":2,\"id\":\"handshake\",\"method\":\"handshake\",\"instance\":\"github-main\"}\n{\"protocol\":2,\"id\":\"discover\",\"method\":\"discover\",\"configuration\":{\"organizations\":[\"acme\"]},\"credentials\":{\"token\":\"SECRET\"}}\n{\"protocol\":2,\"id\":\"cancel\",\"method\":\"cancel\"}\n";
+    let input=b"{\"protocol_version\":1,\"id\":\"handshake\",\"method\":\"handshake\",\"operation\":\"discover\",\"instance\":\"github-main\"}\n{\"protocol_version\":1,\"id\":\"discover\",\"method\":\"discover\",\"configuration\":{\"organizations\":[\"acme\"]},\"credentials\":{\"token\":\"SECRET\"}}\n{\"protocol_version\":1,\"id\":\"cancel\",\"method\":\"cancel\"}\n";
     let result = process(input).await;
     assert!(String::from_utf8_lossy(&result.stdout).contains("cancelled"));
     assert!(!String::from_utf8_lossy(&result.stdout).contains("SECRET"));
@@ -100,4 +100,16 @@ async fn real_binary_request_deadline_exits_with_stdin_kept_open() {
     assert!(!output.status.success());
     assert!(String::from_utf8_lossy(&output.stdout).contains("unavailable"));
     drop(stdin);
+}
+
+#[tokio::test]
+async fn real_binary_rejects_draft2_discovery_handshake() {
+    let result = process(
+        b"{\"protocol\":2,\"id\":\"handshake\",\"method\":\"handshake\",\"instance\":\"legacy\"}\n",
+    )
+    .await;
+    assert!(!result.status.success());
+    let output = String::from_utf8(result.stdout).unwrap();
+    assert!(output.contains("protocol_error"));
+    assert!(!output.contains("capabilities"));
 }

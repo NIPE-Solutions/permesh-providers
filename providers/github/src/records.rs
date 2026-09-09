@@ -118,6 +118,8 @@ impl Collection {
             key: key.clone(),
             login: login.into(),
             kind,
+            affiliation: Affiliation::Unknown,
+            status: IdentityStatus::Unknown,
             verified_emails: vec![],
         });
         // An omitted type is not a contrary claim. Refine unknown observations
@@ -164,6 +166,8 @@ impl Collection {
             .or_insert_with(|| Resource {
                 key: key.clone(),
                 name: full_name.into(),
+                kind: Some("github.repository".into()),
+                parent: None,
             });
         Some((key, owner.into(), name.into()))
     }
@@ -250,6 +254,13 @@ impl Collection {
                 role: role.into(),
                 privilege,
                 certainty: Certainty::Observed,
+                // API permissions can include inherited access. Assignment labels
+                // describe observed role associations, not proof of direct access.
+                evidence_kind: if method == "github.repository_collaborator_effective" {
+                    EvidenceKind::Permission
+                } else {
+                    EvidenceKind::Assignment
+                },
                 provenance: self.provenance(method),
             },
         );
@@ -313,6 +324,38 @@ pub(super) fn privilege(role: &str) -> Privilege {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn api_kind_does_not_invent_lifecycle_affiliation_or_repository_parent()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let mut state = Collection::new("github")?;
+        state.success = true;
+        for (id, native_type, expected) in [
+            (1, "User", IdentityKind::Human),
+            (2, "Bot", IdentityKind::Bot),
+            (3, "Organization", IdentityKind::Unknown),
+        ] {
+            let key = state
+                .account(
+                    &serde_json::json!({"id":id,"login":format!("user{id}"),"type":native_type}),
+                )
+                .ok_or("missing account")?;
+            let account = &state.accounts[&key];
+            assert_eq!(account.kind, expected);
+            assert_eq!(account.status, IdentityStatus::Unknown);
+            assert_eq!(account.affiliation, Affiliation::Unknown);
+        }
+        state
+            .repository(&serde_json::json!({"id":7,"full_name":"outside/app"}))
+            .ok_or("missing repository")?;
+        let snapshot = state.finish()?;
+        assert_eq!(
+            snapshot.resources[0].kind.as_deref(),
+            Some("github.repository")
+        );
+        assert!(snapshot.resources[0].parent.is_none());
+        Ok(())
+    }
 
     #[test]
     fn omitted_account_type_refines_to_or_preserves_known_kind()

@@ -1,0 +1,9 @@
+{"protocol_version":1,"id":"handshake","capabilities":["accounts","identities","resources","groups","memberships","grants"],"draft":true,"event":"handshake","operations":["discover","check"],"provider":"fixture"}
+{"protocol_version":1,"id":"discover","event":"record","kind":"account","data":{"key":{"provider":"test","id":"account"},"login":"alice","kind":"service","affiliation":"external","status":"suspended","verified_emails":["alice@example.com"]}}
+{"protocol_version":1,"id":"discover","event":"record","kind":"identity","data":{"id":"directory:alice","kind":"service","affiliation":"internal","status":"active","verified_emails":["alice@example.com"]}}
+{"protocol_version":1,"id":"discover","event":"record","kind":"resource","data":{"key":{"provider":"test","id":"resource"},"name":"Repository","kind":"fixture.repository","parent":{"provider":"test","id":"root"}}}
+{"protocol_version":1,"id":"discover","event":"record","kind":"resource","data":{"key":{"provider":"test","id":"root"},"name":"Root","kind":null,"parent":null}}
+{"protocol_version":1,"id":"discover","event":"record","kind":"group","data":{"key":{"provider":"test","id":"group"},"name":"Engineering"}}
+{"protocol_version":1,"id":"discover","event":"record","kind":"membership","data":{"member":{"kind":"account","key":{"provider":"test","id":"account"}},"group":{"provider":"test","id":"group"},"provenance":{"method":"fixture.membership","observed_at":"2026-01-01T00:00:00Z"}}}
+{"protocol_version":1,"id":"discover","event":"record","kind":"grant","data":{"id":"grant","subject":{"kind":"group","key":{"provider":"test","id":"group"}},"resource":{"provider":"test","id":"resource"},"role":"write","privilege":"elevated","certainty":"derived","evidence_kind":"policy_attachment","provenance":{"method":"fixture.grant","observed_at":"2026-01-01T00:00:00Z"}}}
+{"protocol_version":1,"id":"discover","complete":true,"count":7,"event":"complete","limitations":[]}

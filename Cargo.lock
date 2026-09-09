@@ -1539,7 +1539,7 @@ checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
 [[package]]
 name = "permesh-core"
 version = "0.1.0-alpha.2"
-source = "git+https://github.com/NIPE-Solutions/permesh?rev=10ff45b768196c669fbc21f345de9ec1d6a73d96#10ff45b768196c669fbc21f345de9ec1d6a73d96"
+source = "git+https://github.com/NIPE-Solutions/permesh?rev=2c1581771b321b482655863cffa25ad5c3d12d26#2c1581771b321b482655863cffa25ad5c3d12d26"
 dependencies = [
  "serde",
  "thiserror",
@@ -1548,7 +1548,7 @@ dependencies = [
 
 [[package]]
 name = "permesh-native-runtime"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "permesh-core",
  "permesh-provider-protocol",
@@ -1561,7 +1561,7 @@ dependencies = [
 
 [[package]]
 name = "permesh-provider-aws"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "aws-credential-types",
  "aws-sdk-iam",
@@ -1584,7 +1584,7 @@ dependencies = [
 
 [[package]]
 name = "permesh-provider-cloudflare"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "permesh-core",
  "permesh-native-runtime",
@@ -1601,7 +1601,7 @@ dependencies = [
 
 [[package]]
 name = "permesh-provider-github"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "permesh-core",
  "permesh-native-runtime",
@@ -1619,7 +1619,7 @@ dependencies = [
 
 [[package]]
 name = "permesh-provider-google"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "bytes",
  "permesh-core",
@@ -1640,7 +1640,7 @@ dependencies = [
 [[package]]
 name = "permesh-provider-protocol"
 version = "0.1.0-alpha.2"
-source = "git+https://github.com/NIPE-Solutions/permesh?rev=10ff45b768196c669fbc21f345de9ec1d6a73d96#10ff45b768196c669fbc21f345de9ec1d6a73d96"
+source = "git+https://github.com/NIPE-Solutions/permesh?rev=2c1581771b321b482655863cffa25ad5c3d12d26#2c1581771b321b482655863cffa25ad5c3d12d26"
 dependencies = [
  "permesh-core",
  "permesh-provider-sdk",
@@ -1652,7 +1652,7 @@ dependencies = [
 [[package]]
 name = "permesh-provider-sdk"
 version = "0.1.0-alpha.2"
-source = "git+https://github.com/NIPE-Solutions/permesh?rev=10ff45b768196c669fbc21f345de9ec1d6a73d96#10ff45b768196c669fbc21f345de9ec1d6a73d96"
+source = "git+https://github.com/NIPE-Solutions/permesh?rev=2c1581771b321b482655863cffa25ad5c3d12d26#2c1581771b321b482655863cffa25ad5c3d12d26"
 dependencies = [
  "permesh-core",
  "serde",
@@ -1664,7 +1664,7 @@ dependencies = [
 [[package]]
 name = "permesh-secrets"
 version = "0.1.0-alpha.2"
-source = "git+https://github.com/NIPE-Solutions/permesh?rev=10ff45b768196c669fbc21f345de9ec1d6a73d96#10ff45b768196c669fbc21f345de9ec1d6a73d96"
+source = "git+https://github.com/NIPE-Solutions/permesh?rev=2c1581771b321b482655863cffa25ad5c3d12d26#2c1581771b321b482655863cffa25ad5c3d12d26"
 dependencies = [
  "keyring",
  "secrecy",

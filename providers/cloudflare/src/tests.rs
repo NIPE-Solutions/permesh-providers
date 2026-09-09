@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 #![allow(clippy::unwrap_used)]
 use super::*;
-use permesh_core::{Certainty, Privilege};
+use permesh_core::{Affiliation, Certainty, EvidenceKind, IdentityKind, IdentityStatus, Privilege};
 use serde_json::{Value, json};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 const ACCOUNT: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -95,6 +95,30 @@ async fn observes_members_groups_and_exact_zone_assignments_without_verified_ema
     assert!(s.identities.is_empty());
     assert_eq!(s.accounts[0].key.id, format!("member:{ACCOUNT}:{MEMBER}"));
     assert!(s.accounts[0].verified_emails.is_empty());
+    assert_eq!(s.accounts[0].kind, IdentityKind::Unknown);
+    assert_eq!(s.accounts[0].status, IdentityStatus::Unknown);
+    assert_eq!(s.accounts[0].affiliation, Affiliation::Unknown);
+    assert_eq!(s.resources.len(), 3);
+    for resource in &s.resources {
+        let kind = if resource.key.id.starts_with("account:") {
+            assert!(resource.parent.is_none());
+            "cloudflare.account"
+        } else {
+            assert_eq!(
+                resource.parent,
+                Some(permesh_core::EntityKey::new(
+                    "cf",
+                    format!("account:{ACCOUNT}")
+                ))
+            );
+            if resource.key.id.starts_with("zone:") {
+                "cloudflare.zone"
+            } else {
+                "cloudflare.policy_scope"
+            }
+        };
+        assert_eq!(resource.kind.as_deref(), Some(kind));
+    }
     assert_eq!(s.groups.len(), 1);
     assert_eq!(s.memberships.len(), 1);
     assert_eq!(s.grants.len(), 2);
@@ -102,7 +126,9 @@ async fn observes_members_groups_and_exact_zone_assignments_without_verified_ema
         s.grants
             .iter()
             .all(|g| matches!(g.privilege, Privilege::Unknown)
-                && matches!(g.certainty, Certainty::Observed))
+                && matches!(g.certainty, Certainty::Observed)
+                && g.evidence_kind == EvidenceKind::Assignment
+                && g.role == "Custom Manager")
     );
     assert!(
         s.grants
@@ -405,7 +431,7 @@ async fn future_scope_constraints_cannot_be_silently_discarded() {
 }
 #[tokio::test]
 async fn shared_runtime_discovery_cross_decodes_assignments_and_partial_categories() {
-    use permesh_provider_protocol::DiscoveryDecoder;
+    use permesh_provider_protocol::negotiated::DiscoveryDecoder;
     for status in [200, 403, 401] {
         let partial = status != 200;
         let (p, t) = mock(move |target| {
@@ -445,21 +471,17 @@ async fn shared_runtime_discovery_cross_decodes_assignments_and_partial_categori
         });
         let request = format!(
             "{}\n{}\n",
-            json!({"protocol":2,"id":"handshake","method":"handshake","instance":"cf"}),
-            json!({"protocol":2,"id":"discover","method":"discover","configuration":{"account_id":ACCOUNT},"credentials":{"token":"test-secret"}})
+            json!({"protocol_version":1,"id":"handshake","method":"handshake","instance":"cf","operation":"discover"}),
+            json!({"protocol_version":1,"id":"discover","method":"discover","configuration":{"account_id":ACCOUNT},"credentials":{"token":"test-secret"}})
         );
         host.write_all(request.as_bytes()).await.unwrap();
         let mut output = Vec::new();
         host.read_to_end(&mut output).await.unwrap();
         assert!(task.await.unwrap().is_ok());
         assert!(!String::from_utf8_lossy(&output).contains("test-secret"));
-        let mut decoder = DiscoveryDecoder::new_versioned(
-            "cloudflare",
-            "cf",
-            Some(&provider_metadata().capabilities),
-            2,
-        )
-        .unwrap();
+        let mut decoder =
+            DiscoveryDecoder::new("cloudflare", "cf", Some(&provider_metadata().capabilities))
+                .unwrap();
         for frame in output.split_inclusive(|b| *b == b'\n') {
             decoder.push_frame(frame).unwrap();
         }
@@ -469,6 +491,24 @@ async fn shared_runtime_discovery_cross_decodes_assignments_and_partial_categori
         assert_eq!(snapshot.accounts.len(), 1);
         assert_eq!(snapshot.grants.len(), 1);
         assert!(matches!(snapshot.grants[0].privilege, Privilege::Unknown));
+        assert_eq!(snapshot.grants[0].evidence_kind, EvidenceKind::Assignment);
+        assert_eq!(snapshot.grants[0].certainty, Certainty::Observed);
+        assert_eq!(snapshot.grants[0].role, "Custom Manager");
+        assert_eq!(snapshot.accounts[0].status, IdentityStatus::Unknown);
+        assert_eq!(snapshot.accounts[0].affiliation, Affiliation::Unknown);
+        let zone = snapshot
+            .resources
+            .iter()
+            .find(|r| r.key.id == format!("zone:{ZONE}"))
+            .unwrap();
+        assert_eq!(zone.kind.as_deref(), Some("cloudflare.zone"));
+        assert_eq!(
+            zone.parent,
+            Some(permesh_core::EntityKey::new(
+                "cf",
+                format!("account:{ACCOUNT}")
+            ))
+        );
         t.abort();
     }
 }

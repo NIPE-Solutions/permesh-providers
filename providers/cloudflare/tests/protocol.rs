@@ -57,8 +57,8 @@ async fn binary_describes_valid_setup_without_credentials_or_network() {
 async fn binary_rejects_credentials_in_configuration_and_unknown_fields_without_reflection() {
     let input = format!(
         "{}\n{}\n",
-        json!({"protocol":2,"id":"handshake","method":"handshake","instance":"cf"}),
-        json!({"protocol":2,"id":"discover","method":"discover","configuration":{"account_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","token":"SENTINEL"},"credentials":{"token":"SENTINEL"}})
+        json!({"protocol_version":1,"id":"handshake","method":"handshake","instance":"cf","operation":"discover"}),
+        json!({"protocol_version":1,"id":"discover","method":"discover","configuration":{"account_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","token":"SENTINEL"},"credentials":{"token":"SENTINEL"}})
     );
     let result = process(input.as_bytes()).await;
     assert!(!result.status.success());
@@ -70,12 +70,26 @@ async fn binary_rejects_credentials_in_configuration_and_unknown_fields_without_
 async fn binary_honors_queued_cancellation_before_discovery() {
     let input = format!(
         "{}\n{}\n{}\n",
-        json!({"protocol":2,"id":"handshake","method":"handshake","instance":"cf"}),
-        json!({"protocol":2,"id":"discover","method":"discover","configuration":{"account_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},"credentials":{"token":"SENTINEL"}}),
-        json!({"protocol":2,"id":"cancel","method":"cancel"})
+        json!({"protocol_version":1,"id":"handshake","method":"handshake","instance":"cf","operation":"discover"}),
+        json!({"protocol_version":1,"id":"discover","method":"discover","configuration":{"account_id":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},"credentials":{"token":"SENTINEL"}}),
+        json!({"protocol_version":1,"id":"cancel","method":"cancel"})
     );
     let result = process(input.as_bytes()).await;
     assert!(result.status.success());
     assert!(String::from_utf8_lossy(&result.stdout).contains("cancelled"));
     assert!(!String::from_utf8_lossy(&result.stdout).contains("SENTINEL"));
+}
+
+#[tokio::test]
+async fn binary_rejects_draft_discovery_and_unselected_operations_before_credentials() {
+    for handshake in [
+        json!({"protocol":2,"id":"handshake","method":"handshake","instance":"cf"}),
+        json!({"protocol_version":1,"id":"handshake","method":"handshake","instance":"cf"}),
+        json!({"protocol_version":1,"id":"handshake","method":"handshake","instance":"cf","operation":"describe"}),
+    ] {
+        let result = process(format!("{handshake}\n").as_bytes()).await;
+        assert!(!result.status.success());
+        assert!(result.stderr.is_empty());
+        assert!(String::from_utf8_lossy(&result.stdout).contains("protocol_error"));
+    }
 }

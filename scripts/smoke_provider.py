@@ -69,9 +69,50 @@ def smoke(binary, provider='github'):
     print('Offline native description passed; no workspace or credentials supplied.')
 
 
+def smoke_negotiated(binary, provider='github'):
+    """Negotiate each operation then cancel, without sending API credentials."""
+    if provider not in PROVIDERS:
+        raise ValueError('unsupported provider')
+    binary = Path(binary).resolve(strict=True)
+    environment = {key: os.environ[key] for key in ('SystemRoot',) if key in os.environ}
+    for operation in ('check', 'discover'):
+        handshake = dict(protocol_version=1, id='handshake', method='handshake',
+                         instance=f'{provider}-main', operation=operation)
+        cancel = dict(protocol_version=1, id='cancel', method='cancel')
+        payload = ''.join(json.dumps(frame, separators=(',', ':')) + '\n'
+                          for frame in (handshake, cancel)).encode()
+        with tempfile.TemporaryDirectory(prefix='permesh-provider-negotiation-') as directory:
+            result = subprocess.run([str(binary)], input=payload, cwd=directory, env=environment,
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=15)
+            if result.returncode or result.stderr or len(result.stdout) > 128 * 1024 or not result.stdout.endswith(b'\n'):
+                raise ValueError('unexpected negotiated provider output')
+            frames = [json.loads(line, object_pairs_hook=unique_object) for line in result.stdout.splitlines()]
+            if len(frames) != 2 or not all(isinstance(frame, dict) for frame in frames):
+                raise ValueError('negotiation requires handshake and cancellation terminal')
+            if any(type(frame.get('protocol_version')) is not int for frame in frames) or frames[0].get('draft') is not True:
+                raise ValueError('native negotiated response has invalid scalar types')
+            actual = dict(frames[0])
+            capabilities = actual.pop('capabilities', None)
+            operations = actual.pop('operations', None)
+            expected = dict(protocol_version=1, id='handshake', event='handshake', provider=provider, draft=True)
+            if (actual != expected or not isinstance(capabilities, list)
+                    or not all(isinstance(item, str) for item in capabilities)
+                    or sorted(capabilities) != sorted(PROVIDERS[provider])
+                    or not isinstance(operations, list)
+                    or not all(isinstance(item, str) for item in operations)
+                    or sorted(operations) != ['check', 'discover']):
+                raise ValueError('negotiated handshake differs from provider contract')
+            if frames[1] != dict(protocol_version=1, id='cancel', event='cancelled'):
+                raise ValueError('negotiated cancellation terminal is invalid')
+            if list(Path(directory).iterdir()):
+                raise ValueError('negotiation unexpectedly wrote files')
+    print('Offline negotiated discovery/health passed; no invocation or credentials supplied.')
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('binary', type=Path)
     parser.add_argument('--provider', choices=PROVIDERS, default='github')
     args = parser.parse_args()
     smoke(args.binary, args.provider)
+    smoke_negotiated(args.binary, args.provider)

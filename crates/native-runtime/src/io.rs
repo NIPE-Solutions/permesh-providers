@@ -59,7 +59,7 @@ impl<R: AsyncRead + Unpin> Input<R> {
 pub(super) struct Output<W> {
     writer: W,
     total: usize,
-    pub version: u32,
+    pub contract: super::request::RequestContract,
     pub id: &'static str,
 }
 struct Limited(Vec<u8>);
@@ -80,14 +80,17 @@ impl<W: AsyncWrite + Unpin> Output<W> {
         Self {
             writer,
             total: 0,
-            version: 2,
+            contract: super::request::RequestContract::NegotiatedV1,
             id: "handshake",
         }
     }
     pub async fn send(&mut self, event: &impl Serialize) -> Result<(), Failure> {
         #[derive(Serialize)]
         struct Envelope<'a, T> {
-            protocol: u32,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            protocol: Option<u32>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            protocol_version: Option<u32>,
             id: &'static str,
             #[serde(flatten)]
             event: &'a T,
@@ -96,7 +99,13 @@ impl<W: AsyncWrite + Unpin> Output<W> {
         serde_json::to_writer(
             &mut frame,
             &Envelope {
-                protocol: self.version,
+                protocol: match self.contract {
+                    super::request::RequestContract::NegotiatedV1 => None,
+                    super::request::RequestContract::LegacySetup => Some(3),
+                    super::request::RequestContract::LegacyAuth => Some(4),
+                },
+                protocol_version: (self.contract == super::request::RequestContract::NegotiatedV1)
+                    .then_some(1),
                 id: self.id,
                 event,
             },

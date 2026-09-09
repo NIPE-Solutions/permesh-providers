@@ -68,3 +68,29 @@ async fn absent_browser_auth_cross_decodes_as_provider_failure_not_invalid_schem
     assert_eq!(error["code"], "unsupported_method");
     Ok(())
 }
+
+#[test]
+fn negotiated_handshake_requires_one_explicit_family_and_supported_operation() {
+    use permesh_native_runtime::validate_request;
+    for operation in ["check", "discover"] {
+        let frame = format!(
+            r#"{{"protocol_version":1,"id":"handshake","method":"handshake","instance":"test","operation":"{operation}"}}"#
+        );
+        assert!(validate_request::<WithoutBrowserAuth>(frame.as_bytes()).is_ok());
+    }
+    for frame in [
+        r#"{"protocol":2,"id":"handshake","method":"handshake","instance":"test"}"#,
+        r#"{"protocol_version":1,"id":"handshake","method":"handshake","instance":"test"}"#,
+        r#"{"protocol_version":1,"protocol":3,"id":"handshake","method":"handshake","instance":"test","operation":"check"}"#,
+        r#"{"protocol_version":null,"id":"handshake","method":"handshake","instance":"test","operation":"check"}"#,
+        r#"{"protocol_version":1,"protocol_version":1,"id":"handshake","method":"handshake","instance":"test","operation":"check"}"#,
+        r#"{"protocol_version":1,"id":"handshake","method":"handshake","instance":"test","operation":"describe"}"#,
+        r#"{"protocol":3,"id":"handshake","method":"handshake","instance":"test","operation":"check"}"#,
+        r#"{"protocol_version":1,"id":"handshake","method":"handshake","instance":"test","operation":null}"#,
+    ] {
+        assert!(
+            validate_request::<WithoutBrowserAuth>(frame.as_bytes()).is_err(),
+            "{frame}"
+        );
+    }
+}

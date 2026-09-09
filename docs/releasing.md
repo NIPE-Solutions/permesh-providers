@@ -15,8 +15,10 @@ macOS and Windows, the declared Rust 1.94.1 minimum, and dependency checks. Nati
 candidate jobs test and build on each target's native runner with locked Cargo
 dependencies; they do not cross-compile or use live provider credentials.
 
-Each native job also exercises the real executable's draft 3 setup protocol with
-an empty environment and temporary working directory. Packaging uses fixed ZIP
+Each native job also exercises the real executable's draft 3 setup protocol and
+negotiated v1 check/discover handshakes followed by cancellation, with an empty
+environment and temporary working directory. No credentials or discovery
+invocations are supplied; these checks do not establish live API coverage. Packaging uses fixed ZIP
 metadata and includes exactly `provider` (`provider.exe` on Windows) and `LICENSE`.
 The combined license includes source-supplied dependency licenses and notices from
 the locked, target-filtered Cargo graph. Missing, linked or oversized inputs fail
@@ -36,6 +38,10 @@ Merge only after all required jobs and review pass. Confirm that the merged tree
 matches the qualified tree. Keep the exact source revision, workflow run and
 qualification results in the release notes. Rebuilding a changed tree requires
 new qualification.
+
+Before publishing 0.2.0 candidates, complete the host installation and workspace
+selection gate in [the upgrade guide](negotiated-v1.md). A successful native
+build alone does not establish installer compatibility.
 
 ## Publication
 
@@ -61,7 +67,7 @@ python3 -m unittest discover -s scripts -p 'test_*.py'
 cargo build --release --locked --target aarch64-apple-darwin
 python3 scripts/smoke_provider.py target/aarch64-apple-darwin/release/permesh-provider-github
 python3 scripts/package_provider.py --target aarch64-apple-darwin --output candidate-output
-python3 scripts/verify_package.py candidate-output/permesh-provider-github-0.1.0-aarch64-apple-darwin.zip --entry candidate-output/catalog-entry.json
+python3 scripts/verify_package.py candidate-output/permesh-provider-github-0.2.0-aarch64-apple-darwin.zip --entry candidate-output/catalog-entry.json
 ```
 
 Substitute the local native target. Packaging requires a new output directory.

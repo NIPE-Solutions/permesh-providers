@@ -118,11 +118,79 @@ async fn status_is_conservative_and_tenant_mismatch_excluded() {
         [
             IdentityStatus::Active,
             IdentityStatus::Unknown,
-            IdentityStatus::Inactive,
+            IdentityStatus::Suspended,
             IdentityStatus::Inactive,
             IdentityStatus::Unknown
         ]
     );
+}
+#[test]
+fn lifecycle_and_affiliation_follow_only_directory_evidence() {
+    let provider = GoogleProvider::new(
+        "directory".into(),
+        "C123".into(),
+        Secret::new("private-token".into()),
+    )
+    .unwrap();
+    for (suspended, archived, expected, malformed) in [
+        (
+            Some(json!(false)),
+            Some(json!(false)),
+            IdentityStatus::Active,
+            false,
+        ),
+        (
+            Some(json!(true)),
+            Some(json!(false)),
+            IdentityStatus::Suspended,
+            false,
+        ),
+        (
+            Some(json!(true)),
+            Some(json!(true)),
+            IdentityStatus::Inactive,
+            false,
+        ),
+        (None, Some(json!(true)), IdentityStatus::Inactive, false),
+        (Some(json!(true)), None, IdentityStatus::Suspended, false),
+        (Some(json!(false)), None, IdentityStatus::Unknown, false),
+        (None, None, IdentityStatus::Unknown, false),
+        (
+            Some(json!("false")),
+            Some(json!(false)),
+            IdentityStatus::Unknown,
+            true,
+        ),
+        (
+            Some(json!(true)),
+            Some(json!(null)),
+            IdentityStatus::Suspended,
+            true,
+        ),
+        (
+            Some(json!(null)),
+            Some(json!(true)),
+            IdentityStatus::Inactive,
+            true,
+        ),
+    ] {
+        let mut row = user("1");
+        for (field, value) in [("suspended", suspended), ("archived", archived)] {
+            if let Some(value) = value {
+                row[field] = value;
+            } else {
+                row.as_object_mut().unwrap().remove(field);
+            }
+        }
+        let (account, identity, partial) = provider.record(&row).unwrap();
+        assert_eq!(account.status, expected);
+        assert_eq!(identity.status, expected);
+        assert_eq!(account.kind, IdentityKind::Unknown);
+        assert_eq!(identity.kind, IdentityKind::Unknown);
+        assert_eq!(account.affiliation, Affiliation::Unknown);
+        assert_eq!(identity.affiliation, Affiliation::Unknown);
+        assert_eq!(partial, malformed);
+    }
 }
 #[tokio::test]
 async fn pagination_encodes_opaque_tokens_and_detects_cycles() {
@@ -371,6 +439,8 @@ async fn canonical_alias_survives_primary_email_rename_and_instance_change() {
             key: EntityKey::new("github", "456"),
             login: "octocat".into(),
             kind: IdentityKind::Human,
+            affiliation: permesh_core::Affiliation::Unknown,
+            status: IdentityStatus::Unknown,
             verified_emails: vec![],
         });
         let snapshots = [directory, github];

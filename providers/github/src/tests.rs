@@ -3,7 +3,7 @@
 mod tests {
     use crate::client::{Budget, next_page, retry_delay};
     use crate::*;
-    use permesh_core::Privilege;
+    use permesh_core::{Affiliation, Certainty, EvidenceKind, IdentityStatus, Privilege};
     use permesh_provider_sdk::Provider;
     use reqwest::header::HeaderMap;
     use time::{OffsetDateTime, format_description::well_known::Rfc2822};
@@ -94,6 +94,38 @@ mod tests {
         assert!(!snapshot.complete);
         assert_eq!(snapshot.accounts.len(), 1);
         assert!(snapshot.accounts[0].verified_emails.is_empty());
+        assert!(
+            snapshot
+                .accounts
+                .iter()
+                .all(|account| account.status == IdentityStatus::Unknown
+                    && account.affiliation == Affiliation::Unknown)
+        );
+        for resource in &snapshot.resources {
+            if resource.key.id.starts_with("organization:") {
+                assert_eq!(resource.kind.as_deref(), Some("github.organization"));
+                assert!(resource.parent.is_none());
+            } else {
+                assert_eq!(resource.kind.as_deref(), Some("github.repository"));
+                assert!(
+                    resource.parent.as_ref().is_some_and(|parent| snapshot
+                        .resources
+                        .iter()
+                        .any(|org| org.key == *parent))
+                );
+            }
+        }
+        for grant in &snapshot.grants {
+            assert_eq!(grant.certainty, Certainty::Observed);
+            assert_eq!(
+                grant.evidence_kind,
+                if grant.provenance.method == "github.repository_collaborator_effective" {
+                    EvidenceKind::Permission
+                } else {
+                    EvidenceKind::Assignment
+                }
+            );
+        }
         let grant = snapshot
             .grants
             .iter()
@@ -185,12 +217,10 @@ mod tests {
                 .iter()
                 .any(|g| g.role == "admin" && g.privilege == Privilege::Owner)
         );
-        assert!(
-            snapshot
-                .grants
-                .iter()
-                .any(|g| g.role == "security-reviewer" && g.privilege == Privilege::Unknown)
-        );
+        assert!(snapshot.grants.iter().any(|g| g.role == "security-reviewer"
+            && g.privilege == Privilege::Unknown
+            && g.evidence_kind == EvidenceKind::Assignment
+            && g.certainty == Certainty::Observed));
         task.abort();
     }
 
