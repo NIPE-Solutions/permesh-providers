@@ -32,9 +32,9 @@ credentials you explicitly configure, and have no Permesh backend or telemetry.
 release or a claim of complete live qualification. No provider is declared stable.
 
 GitHub 0.1.0 is available for macOS Apple Silicon and Intel, Linux GNU ARM64 and
-x86_64, and Windows x86_64. Recorded five-target runs cover earlier GitHub, Google,
-Cloudflare and IAM source revisions. GitLab, Entra and Identity Center have local
-synthetic/native checks; their five-target qualification remains pending. See the
+x86_64, and Windows x86_64. A recorded five-target candidate run covers all seven providers at one exact source
+tree, with 35 trial packages independently verified. These unsigned candidates
+remain unpublished, and live qualification is separate. See the
 [exact qualification matrix](docs/qualification.md). Candidates require a compatible current-source CLI; see
 [candidate compatibility](docs/negotiated-v1.md). Source versions do not change
 already published binaries.
